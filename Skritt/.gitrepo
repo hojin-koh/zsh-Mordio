@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/hojin-koh/zsh-Skritt
+	branch = main
+	commit = aea0b76c3b3aa135b1a4a4bbcabb00150b82a796
+	parent = 4dd9a83a23cf17474a84f1381c34e0f1e9f38300
+	method = merge
+	cmdver = 0.4.6

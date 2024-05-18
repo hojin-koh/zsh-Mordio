@@ -14,7 +14,7 @@
 
 # Filesystem-related functions
 
-declare -a skrittTempDirs
+declare -ga skrittTempDirs
 
 # Add temp dir
 putTemp() {

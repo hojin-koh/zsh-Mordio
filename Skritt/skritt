@@ -34,11 +34,15 @@ if [[ -z "${SKRITT_ROOT_DIR-}" ]]; then
   export SKRITT_ROOT_DIR="${0:a:h}"
 fi
 
-source "${0:a:h}/lib/flow.zsh"
-source "${0:a:h}/lib/opts.zsh"
-source "${0:a:h}/lib/msg.zsh"
-source "${0:a:h}/lib/logging.zsh"
-source "${0:a:h}/lib/fs.zsh"
+source "$SKRITT_ROOT_DIR/lib/flow.zsh"
+source "$SKRITT_ROOT_DIR/lib/opts.zsh"
+source "$SKRITT_ROOT_DIR/lib/msg.zsh"
+source "$SKRITT_ROOT_DIR/lib/logging.zsh"
+source "$SKRITT_ROOT_DIR/lib/fs.zsh"
+
+if declare -f skrittLibraryInit >/dev/null; then
+  skrittLibraryInit
+fi
 
 opt -Skritt check false "Check whether this script need to run (return false=need)"
 opt -Skritt force false "Always run the script even if there's no need"
@@ -47,7 +51,7 @@ if declare -f setupArgs >/dev/null; then
   setupArgs
 fi
 SKRITT::FLOW::preparse "$@"
-source "${0:a:h}/bin/parseopts"
+source "$SKRITT_ROOT_DIR/bin/parseopts"
 SKRITT::FLOW::postparse "$@"
 
 skrittNeedToRun=true

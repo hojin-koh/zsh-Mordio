@@ -123,6 +123,8 @@ When a special option `--check` is specified, the script will return the return 
 The overall flow of the script looks like this:
 
 ```
+skrittLibraryInit()
+
 setupArgs()
 
 "preparse" hooks

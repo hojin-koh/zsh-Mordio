@@ -14,11 +14,11 @@
 
 # Option-related functions
 
-declare -a skrittOpts
-declare -a skrittOptGroups
-declare -a skrittRequiredArgs
-declare -A skrittMapOptGroup
-declare -A skrittMapOptDesc
+declare -ga skrittOpts
+declare -ga skrittOptGroups
+declare -ga skrittRequiredArgs
+declare -gA skrittMapOptGroup
+declare -gA skrittMapOptDesc
 
 # The utility to declare an option
 # Usage: opt [-r] [-<Group Name>] <opt-name> <default-value> <description>

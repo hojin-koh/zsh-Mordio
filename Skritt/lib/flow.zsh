@@ -43,18 +43,18 @@ invokeHook() {
   debug "End Hook: $nameHook"
 }
 
-declare -a SKRITT_HOOK_preparse
+declare -ga SKRITT_HOOK_preparse
 SKRITT::FLOW::preparse() {
   invokeHook preparse "$@"
 }
 
-declare -a SKRITT_HOOK_postparse
+declare -ga SKRITT_HOOK_postparse
 SKRITT::FLOW::postparse() {
   invokeHook postparse "$@"
 }
 
-SKRITT_BEGIN_DATE="$(date +'%Y-%m-%d %H:%M:%S')"
-declare -a SKRITT_HOOK_prescript
+declare -g SKRITT_BEGIN_DATE="$(date +'%Y-%m-%d %H:%M:%S')"
+declare -ga SKRITT_HOOK_prescript
 SKRITT::FLOW::prescript() {
   if [[ -n "${logfile-}" ]]; then
     setupLog "$logfile" "$logrotate"
@@ -70,7 +70,7 @@ SKRITT::FLOW::prescript() {
   invokeHook prescript "$@"
 }
 
-declare -a SKRITT_HOOK_exit=()
+declare -ga SKRITT_HOOK_exit=()
 TRAPEXIT() {
   local __rtn=$?
   invokeHook exit "$__rtn"

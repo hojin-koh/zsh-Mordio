@@ -71,7 +71,7 @@ showReadableTime() {
   local __hours=$[__secTotal/3600]
   local __minutes=$[(__secTotal%3600)/60]
   local __seconds=$[__secTotal%60]
-  if [[ $__hours == 0 ]]; then
+  if [[ $__hours -lt 1 ]]; then
     printf "%dm%ds" $__minutes $__seconds
   else
     printf "%dh%dm%ds" $__hours $__minutes $__seconds

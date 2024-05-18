@@ -14,12 +14,14 @@
 
 # The central runner of Mordio
 
-skrittLibraryInit() {
-  if [[ -z "${MORDIO_ROOT_DIR-}" ]]; then
-    export MORDIO_ROOT_DIR="${0:a:h}"
-  fi
+if [[ -z "${MORDIO_ROOT_DIR-}" ]]; then
+  export MORDIO_ROOT_DIR="${0:a:h}"
+fi
 
+skrittLibraryInit() {
   source "$MORDIO_ROOT_DIR/lib/type.zsh"
+
+  opt -Mordio nj "${OMP_NUM_THREADS-3}" "Number of parallel processes on this machine"
 
   if declare -f mordioLibraryInit >/dev/null; then
     mordioLibraryInit

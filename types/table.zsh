@@ -21,5 +21,11 @@ MORDIO::TYPE::table::populate() {
   local __varName="$1"
   local __inout="$2"
 
-  echo "TODO: populate functions $1 $2"
+  eval "${__varName}::save() { MORDIO::TYPE::table::save \"\$$__varName\" }"
+}
+
+MORDIO::TYPE::table::save() {
+  local __fname="$1"
+  mkdir -p "$__fname"
+  cat | zstd --rsyncable -17 > "$__fname/data.zst"
 }

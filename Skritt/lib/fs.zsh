@@ -21,7 +21,7 @@ putTemp() {
   local VARNAME="$1"
   typeset -g "$VARNAME=$(mktemp -d)"
   info "Generated temp dir: ${(P)VARNAME}"
-  skrittTempDir+=("${(P)VARNAME}")
+  skrittTempDirs+=("${(P)VARNAME}")
 }
 
 SKRITT::HOOK::cleanUpTemp() {

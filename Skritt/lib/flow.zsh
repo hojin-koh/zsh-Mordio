@@ -61,9 +61,9 @@ SKRITT::FLOW::prescript() {
   fi
 
   if [[ -n "${skrittCommandLineOriginal-}" ]]; then
-    info "> Begin $skrittCommandLineOriginal"
+    titleinfo "> Begin $$ $skrittCommandLineOriginal"
   else
-    info "> Begin $ZSH_ARGZERO $@"
+    titleinfo "> Begin $$ $ZSH_ARGZERO $@"
   fi
   info "$SKRITT_BEGIN_DATE (SHLVL=$SHLVL)"
 
@@ -75,7 +75,7 @@ TRAPEXIT() {
   local __rtn=$?
   invokeHook exit "$__rtn"
   if [[ "$__rtn" == 0 ]]; then
-    info "< End $ZSH_ARGZERO"
+    titleinfo "< ($(showReadableTime $SECONDS)) End $$ $ZSH_ARGZERO"
   else
     err "< End with error ($__rtn) $ZSH_ARGZERO"
   fi

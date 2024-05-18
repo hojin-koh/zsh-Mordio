@@ -7,7 +7,8 @@ A heavily-opinionated and colorful zsh scripting framework. This library is gear
 - zsh: obviously.
 - GNU coreutils
 - zstd: for compression of log files. (I did mention this is heavily-opinionated, right?)
-- util-linux(optional): for printing help message with column
+- util-linux(optional): for printing help message with `column`
+- pv(optional): only if you need the progess-bar functionality
 
 ## Installation
 

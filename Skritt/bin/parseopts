@@ -63,11 +63,7 @@ while true; do
   # If the enclosing script is called with --help option, print the help
   # message and exit.  Scripts should put help messages in $tris_help_message
   --help|-h)
-    if [[ -z "${skrittHelpMessage-}" ]]; then
-      echo "No help found." >&2
-    else
-      printf "%s\n" "$skrittHelpMessage" | column -tLs $'\t' >&2
-    fi
+    printHelpMessage
     unset -f TRAPEXIT
     exit 0 ;;
   --*=*)
@@ -95,4 +91,3 @@ fi
 unset __programargs
 unset -f __::parse_one_option
 unset -f __::errexit
-

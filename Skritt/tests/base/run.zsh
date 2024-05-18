@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-desc="The test runner"
+description="The test runner"
 
 main() {
   ./00.can-run.zsh

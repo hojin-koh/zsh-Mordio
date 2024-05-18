@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-desc="Test argument parsing"
+description="Test argument parsing"
 
 setupArgs() {
   opt -r rslt '' "Check Result"

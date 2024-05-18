@@ -14,7 +14,7 @@
 
 # Filesystem-related functions
 
-skrittTempDir=()
+declare -a skrittTempDirs
 
 # Add temp dir
 putTemp() {
@@ -25,7 +25,7 @@ putTemp() {
 }
 
 SKRITT::HOOK::cleanUpTemp() {
-  for pathTmp in "${(@)skrittTempDir}"; do
+  for pathTmp in "${(@)skrittTempDirs}"; do
     if [[ "$pathTmp" != /tmp* ]]; then
       continue
     fi

@@ -14,16 +14,24 @@
 
 # Option-related functions
 
-skrittHelpMessage="${desc-}"$'\n'$'\n'
-skrittOpts=()
-skrittRequiredArgs=()
+declare -a skrittOpts
+declare -a skrittOptGroups
+declare -a skrittRequiredArgs
+declare -A skrittMapOptGroup
+declare -A skrittMapOptDesc
 
 # The utility to declare an option
-# Usage: opt [-r] <opt-name> <default-value> <description>
+# Usage: opt [-r] [-<Group Name>] <opt-name> <default-value> <description>
 opt() {
   local __required=false
   if [[ "${1-}" == "-r" ]]; then
     __required=true
+    shift
+  fi
+  # A group is specified
+  local __group=""
+  if [[ "${1-}" == -* ]]; then
+    __group="${1:1}"
     shift
   fi
   local __name="$1"
@@ -32,12 +40,24 @@ opt() {
   local __value="$2"
   local __desc="$3"
   skrittOpts+=( "$__nameVar" )
+
+  # Write the description of this option
   if [[ "$__required" == true ]]; then
-    skrittHelpMessage+="  $__name=$__value"$'\t'"$__desc"$'\n'
+    skrittMapOptDesc[$__nameVar]="$__name=(Required)"$'\t'"$__desc"
     skrittRequiredArgs+=( "$__nameVar" )
   else
-    skrittHelpMessage+="  [--]$__name=$__value"$'\t'"$__desc"$'\n'
+    skrittMapOptDesc[$__nameVar]="[--]$__name=$__value"$'\t'"$__desc"
   fi
+
+  # Take note of group, and add to group list if not yet done
+  skrittMapOptGroup[$__nameVar]="$__group"
+  if [[ ${skrittOptGroups[(i)$__group]} -gt ${#skrittOptGroups} ]]; then
+    if [[ -n "$__group" && "$__group" != "Skritt" ]]; then
+      skrittOptGroups+=( "$__group" )
+    fi
+  fi
+
+  # Make the variable and assign it the default value
   if [[ "$__value" == "("* ]]; then
     declare -ga "$__nameVar"
     eval "$__nameVar=$__value"
@@ -45,6 +65,18 @@ opt() {
     declare -g "$__nameVar"
     eval "$__nameVar='$__value'"
   fi
+}
+
+printHelpMessage() {
+  (
+    printf "%s\n\n" "${description-}"
+    for grp in "" "${skrittOptGroups[@]}" "Skritt"; do
+      if [[ -n "$grp" ]]; then printf "\n%s Options:\n\n" "$grp"; fi
+      for var in ${(k)skrittMapOptGroup[(R)$grp]}; do
+        printf "  %s\n" "${skrittMapOptDesc[$var]}"
+      done
+    done
+  ) | if command -v column >/dev/null; then column -tLs $'\t'; else cat; fi >&2
 }
 
 checkRequiredArgs() {

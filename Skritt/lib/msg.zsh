@@ -14,7 +14,7 @@
 
 # Message-related functions
 typeset -F SECONDS
-opt debug false "Whether to show debug messages on screen"
+opt -Skritt debug false "Whether to show debug messages on screen"
 
 __::outputMessage() {
   local typ="$1"
@@ -61,4 +61,3 @@ promptyn() {
   echo >&5
   printf "[%06.1f] REPLY=%s\n" "$SECONDS" "$REPLY" >&6
 }
-

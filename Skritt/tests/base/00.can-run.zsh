@@ -1,10 +1,10 @@
 #!/usr/bin/env zsh
-desc="Test if a simple script can be run"
+description="Test if a simple script can be run"
 
 main() {
-  debug "$desc"
-  info "$desc"
-  warn "$desc"
+  debug "$description"
+  info "$description"
+  warn "$description"
 }
 
 source "${0:a:h}/../../skritt"

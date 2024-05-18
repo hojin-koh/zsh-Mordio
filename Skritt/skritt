@@ -1,4 +1,3 @@
-#!/usr/bin/env zsh
 # Copyright 2020-2024, Hojin Koh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,8 +40,8 @@ source "${0:a:h}/lib/msg.zsh"
 source "${0:a:h}/lib/logging.zsh"
 source "${0:a:h}/lib/fs.zsh"
 
-opt check false "Check whether this script need to run (return false=need)"
-opt force false "Always run the script even if there's no need"
+opt -Skritt check false "Check whether this script need to run (return false=need)"
+opt -Skritt force false "Always run the script even if there's no need"
 
 if declare -f setupArgs >/dev/null; then
   setupArgs

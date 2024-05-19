@@ -36,9 +36,10 @@ invokeHook() {
     return
   fi
   debug "Invoke Hook: $nameHook"
-  for f in "${(P@)nameArray}"; do
-    debug "Start hook function $f"
-    "$f" "$@"
+  local func
+  for func in "${(P@)nameArray}"; do
+    debug "Start hook function $func"
+    "$func" "$@"
   done
   debug "End Hook: $nameHook"
 }
@@ -72,12 +73,12 @@ SKRITT::FLOW::prescript() {
 
 declare -ga SKRITT_HOOK_exit=()
 TRAPEXIT() {
-  local __rtn=$?
-  invokeHook exit "$__rtn"
-  if [[ "$__rtn" == 0 ]]; then
+  local rtn=$?
+  invokeHook exit "$rtn"
+  if [[ "$rtn" == 0 ]]; then
     titleinfo "< ($(showReadableTime $SECONDS)) End $$ $ZSH_ARGZERO"
   else
-    err "< End with error ($__rtn) $ZSH_ARGZERO"
+    err "< ($(showReadableTime $SECONDS)) End with error ($rtn) $ZSH_ARGZERO"
   fi
 }
 

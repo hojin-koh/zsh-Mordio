@@ -16,14 +16,14 @@
 typeset -F SECONDS
 opt -Skritt debug false "Whether to show debug messages on screen"
 
-__::outputMessage() {
-  local __typ="$1"
-  local __color="$2"
-  local __msg="$3"
-  local __nl="${4-\n}"
-  local __t="$SECONDS"
-  printf "\033[%sm[%s-%08.1f] %s\033[m\033[K$__nl" "$__color" "$__typ" "$__t" "$__msg" >&5
-  printf "[%s-%08.1f] %s$__nl" "$__typ" "$__t" "$__msg" >&6
+SKRITT::INTERNAL::outputMessage() {
+  local typeMsg="$1"
+  local codeColor="$2"
+  local msg="$3"
+  local charEnd="${4-\n}"
+  local elapsed="$SECONDS"
+  printf "\033[%sm[%s-%08.1f] %s\033[m\033[K$charEnd" "$codeColor" "$typeMsg" "$elapsed" "$msg" >&5
+  printf "[%s-%08.1f] %s$charEnd" "$typeMsg" "$elapsed" "$msg" >&6
 }
 
 debug() {
@@ -35,50 +35,50 @@ debug() {
 }
 
 titleinfo() {
-  __::outputMessage T '1;32' "$1"
+  SKRITT::INTERNAL::outputMessage T '1;32' "$1"
 }
 
 info() {
-  __::outputMessage I '1;37' "$1"
+  SKRITT::INTERNAL::outputMessage I '1;37' "$1"
 }
 
 warn() {
-  __::outputMessage W '1;33' "$1"
+  SKRITT::INTERNAL::outputMessage W '1;33' "$1"
 }
 
 err() {
-  __::outputMessage E '1;31' "$1"
+  SKRITT::INTERNAL::outputMessage E '1;31' "$1"
   if [[ "${2-}" -gt 0 ]]; then
     exit $2
   fi
 }
 
 prompt() {
-  __::outputMessage P '1;36' "$1: " ''
+  SKRITT::INTERNAL::outputMessage P '1;36' "$1: " ''
   read -r REPLY || true
   printf "[%06.1f] REPLY=%s\n" "$SECONDS" "$REPLY" >&6
 }
 
 promptyn() {
-  __::outputMessage P '1;33' "$1 (y/n): " ''
+  SKRITT::INTERNAL::outputMessage P '1;33' "$1 (y/n): " ''
   read -q REPLY || true
   echo >&5
   printf "[%06.1f] REPLY=%s\n" "$SECONDS" "$REPLY" >&6
 }
 
 showReadableTime() {
-  local __secTotal="$1"
-  local __hours=$[__secTotal/3600]
-  local __minutes=$[(__secTotal%3600)/60]
-  local __seconds=$[__secTotal%60]
-  if [[ $__hours -lt 1 ]]; then
-    printf "%dm%ds" $__minutes $__seconds
+  local secTotal="$1"
+  local hours=$[secTotal/3600]
+  local minutes=$[(secTotal%3600)/60]
+  local seconds=$[secTotal%60]
+  if [[ $hours -lt 1 ]]; then
+    printf "%dm%ds" $minutes $seconds
   else
-    printf "%dh%dm%ds" $__hours $__minutes $__seconds
+    printf "%dh%dm%ds" $hours $minutes $seconds
   fi
 }
 
 lineProgressBar() {
-  local __max="$1"
-  pv -l -F "%t %b/$__max %p %e" -i 2 -s $__max
+  local nLineTotal="$1"
+  pv -l -F "%t %b/$nLineTotal %p %e" -i 2 -s $nLineTotal
 }

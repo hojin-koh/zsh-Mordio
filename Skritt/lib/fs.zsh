@@ -25,6 +25,7 @@ putTemp() {
 }
 
 SKRITT::HOOK::cleanUpTemp() {
+  local pathTmp
   for pathTmp in "${(@)skrittTempDirs}"; do
     if [[ "$pathTmp" != /tmp* ]]; then
       continue

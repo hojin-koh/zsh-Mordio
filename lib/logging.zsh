@@ -1,4 +1,3 @@
-#!/usr/bin/env zsh
 # Copyright 2020-2024, Hojin Koh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,21 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The central runner of Mordio
+opt -Mordio auto-logdir "$MORDIO_LOGDIR" "Directory to keep logs if logfile is not set"
 
-if [[ -z "${MORDIO_ROOT_DIR-}" ]]; then
-  export MORDIO_ROOT_DIR="${0:a:h}"
-fi
-
-skrittLibraryInit() {
-  source "$MORDIO_ROOT_DIR/lib/logging.zsh"
-  source "$MORDIO_ROOT_DIR/lib/type.zsh"
-
-  opt -Mordio nj "${OMP_NUM_THREADS-3}" "Number of parallel processes on this machine"
-
-  if declare -f mordioLibraryInit >/dev/null; then
-    mordioLibraryInit
+MORDIO::FLOW::setupLogging() {
+  if [[ -z "$logfile" ]]; then # If the Skritt version is not set
+    if [[ -n "$auto_logdir" ]]; then # If the Mordio version is set
+      local nameScript="${ZSH_ARGZERO##*/}"
+      nameScript="${nameScript%%.zsh}"
+      logfile="$auto_logdir/$(date +'%Y%m%d-%H%M%S')-$nameScript.log"
+    fi
   fi
 }
-
-source "${0:a:h}/Skritt/skritt"
+addHook postparse MORDIO::FLOW::setupLogging

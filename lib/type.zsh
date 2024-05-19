@@ -37,3 +37,27 @@ optType() {
 
   "${mordioTypeInit[$__type]}" "$__nameVar" "$__inout"
 }
+
+populateType() {
+  local __nameVar="$1"
+  local __namespace="$2"
+
+  local func
+  for func in ${(ok)functions[(I)${__namespace}::*]}; do
+    local stem="${func##*::}"
+    if [[ "$stem" == INIT ]]; then continue; fi
+    eval "${__nameVar}::${stem}() { ${__namespace}::${stem} \"\$$__nameVar\" }"
+  done
+}
+
+MORDIO::FLOW::checkArgs() {
+  local arg
+  for arg in "${(k)mordioMapOptType[@]}"; do
+    ${arg}::checkName
+    if [[ "${mordioMapOptDirection[$arg]}" == "input" ]]; then
+      ${arg}::checkValid
+    fi
+  done
+}
+addHook postparse MORDIO::FLOW::checkArgs
+

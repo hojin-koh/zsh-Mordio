@@ -15,17 +15,64 @@
 # Type definition: table
 # Table is a series of id/content pair
 
-mordioTypeInit[table]=MORDIO::TYPE::table::populate
+mordioTypeInit[table]=MORDIO::TYPE::table::INIT
 
-MORDIO::TYPE::table::populate() {
-  local __varName="$1"
+MORDIO::TYPE::table::INIT() {
+  local __nameVar="$1"
   local __inout="$2"
 
-  eval "${__varName}::save() { MORDIO::TYPE::table::save \"\$$__varName\" }"
+  populateType "$__nameVar" MORDIO::TYPE::table
+}
+
+MORDIO::TYPE::table::checkName() {
+  local __fname="$1"
+  if [[ "$__fname" == *.zst ]]; then
+    true
+  else
+    err "Input argument $__fname has invalid extension" 36
+  fi
+}
+
+MORDIO::TYPE::table::checkValid() {
+  local __fname="$1"
+  if [[ ! -e "$__fname" ]]; then
+    err "Input argument $__fname does not exist" 36
+  fi
+  if [[ ! -e "$__fname.meta" ]]; then
+    err "Input argument $__fname has no metadata" 36
+  fi
+  if [[ "$(stat --printf="%s" "$__fname")" -lt 33 ]]; then
+    err "Input argument $__fname is too small and maybe corrupted" 36
+  fi
+}
+
+MORDIO::TYPE::table::load() {
+  local __fname="$1"
+  if [[ "$__fname" == *.zst ]]; then
+    zstd -dc "$__fname"
+  fi
 }
 
 MORDIO::TYPE::table::save() {
   local __fname="$1"
+  if [[ "$__fname" == */* ]]; then
+    mkdir -p "${__fname##*/}"
+  fi
+  if [[ "$__fname" == *.zst ]]; then
+    cat | zstd --rsyncable -17 > "$__fname"
+  fi
   mkdir -p "$__fname"
-  cat | zstd --rsyncable -17 > "$__fname/data.zst"
+}
+
+# Metadata
+
+MORDIO::TYPE::table::computeMeta() {
+  local __fname="$1"
+  printf 'nRecord='
+  ${__fname}::load | wc -l
+}
+
+MORDIO::TYPE::table::getNR() {
+  local __fname="$1"
+  gawk -F= '/^nRecord=/ {print $2}' "$__fname.meta"
 }

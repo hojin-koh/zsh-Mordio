@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-opt -Mordio auto-logdir "$MORDIO_LOGDIR" "Directory to keep logs if logfile is not set"
+opt -Mordio auto-logdir "${MORDIO_LOGDIR-}" "Directory to keep logs if logfile is not set"
 
 MORDIO::FLOW::setupLogging() {
   if [[ -z "$logfile" ]]; then # If the Skritt version is not set

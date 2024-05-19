@@ -61,3 +61,24 @@ MORDIO::FLOW::checkArgs() {
 }
 addHook postparse MORDIO::FLOW::checkArgs
 
+MORDIO::FLOW::writeMeta() {
+  local arg
+  for arg in "${(k)mordioMapOptType[@]}"; do
+    if [[ "${mordioMapOptDirection[$arg]}" == "input" ]]; then continue; fi
+    (
+      ${arg}::computeMeta
+      printf '\n---\n\n'
+      date +'%Y-%m-%d %H:%M:%S'
+      printf '\n'
+      local grp
+      local var
+      for grp in "" "${skrittOptGroups[@]}" "Skritt"; do
+        if [[ -n "$grp" ]]; then printf "\n# %s Options:\n" "$grp"; fi
+        for var in ${(k)skrittMapOptGroup[(R)$grp]}; do
+          printf "%s=%s\n" "$var" "${(P@)var-}"
+        done
+      done
+    ) | ${arg}::saveMeta
+  done
+}
+addHook postrun MORDIO::FLOW::writeMeta

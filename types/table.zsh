@@ -56,12 +56,11 @@ MORDIO::TYPE::table::load() {
 MORDIO::TYPE::table::save() {
   local __fname="$1"
   if [[ "$__fname" == */* ]]; then
-    mkdir -p "${__fname##*/}"
+    mkdir -pv "${__fname%/*}"
   fi
   if [[ "$__fname" == *.zst ]]; then
     cat | zstd --rsyncable -17 > "$__fname"
   fi
-  mkdir -p "$__fname"
 }
 
 # Metadata
@@ -69,10 +68,18 @@ MORDIO::TYPE::table::save() {
 MORDIO::TYPE::table::computeMeta() {
   local __fname="$1"
   printf 'nRecord='
-  ${__fname}::load | wc -l
+  MORDIO::TYPE::table::load "$__fname" | wc -l
+}
+
+MORDIO::TYPE::table::saveMeta() {
+  local __fname="$1"
+  if [[ "$__fname" == */* ]]; then
+    mkdir -pv "${__fname%/*}"
+  fi
+  cat > "$__fname.meta"
 }
 
 MORDIO::TYPE::table::getNR() {
   local __fname="$1"
-  gawk -F= '/^nRecord=/ {print $2}' "$__fname.meta"
+  gawk -F= '/^nRecord=/ {print $2} /^---$/ {exit}' "$__fname.meta"
 }

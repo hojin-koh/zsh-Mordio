@@ -25,6 +25,9 @@ setupLog() {
   if [[ -d "$fname" ]]; then
     err "Cannot log to $fname, it is a directory!" 2
   fi
+  if [[ "$fname" == */* ]]; then
+    mkdir -pv "${fname%/*}"
+  fi
   if [[ "$nRotate" -gt 0 ]]; then # Do log rotation first if needed
     rotateLog "$fname" "$nRotate"
   fi

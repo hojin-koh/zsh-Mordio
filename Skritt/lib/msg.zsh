@@ -28,10 +28,9 @@ SKRITT::INTERNAL::outputMessage() {
 
 debug() {
   if [[ "${debug-}" == true ]]; then
-    printf "\033[0;34m[D-%06.1f] %s\033[m\033[K\n" "$SECONDS" "$1" >&2
-  else
-    printf "[D-%06.1f] %s\n" "$SECONDS" "$1" >&6
+    printf "\033[0;34m[D-%06.1f] %s\033[m\033[K\n" "$SECONDS" "$1" >&5
   fi
+  printf "[D-%06.1f] %s\n" "$SECONDS" "$1" >&6
 }
 
 titleinfo() {

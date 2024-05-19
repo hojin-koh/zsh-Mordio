@@ -55,7 +55,7 @@ SKRITT::FLOW::postparse() {
   invokeHook postparse "$@"
 }
 
-declare -g SKRITT_BEGIN_DATE="$(date +'%Y-%m-%d %H:%M:%S')"
+declare -g SKRITT_BEGIN_DATE="$(date +'%Y%m%d-%H%M%S')"
 declare -ga SKRITT_HOOK_prerun
 SKRITT::FLOW::prerun() {
   if [[ -n "${logfile-}" ]]; then
@@ -63,12 +63,10 @@ SKRITT::FLOW::prerun() {
   fi
 
   if [[ -n "${skrittCommandLineOriginal-}" ]]; then
-    titleinfo "> Begin $$ $skrittCommandLineOriginal"
+    titleinfo "> ($SKRITT_BEGIN_DATE) Begin $$ $skrittCommandLineOriginal"
   else
-    titleinfo "> Begin $$ $ZSH_ARGZERO $@"
+    titleinfo "> ($SKRITT_BEGIN_DATE) Begin $$ $ZSH_ARGZERO $@"
   fi
-  info "$SKRITT_BEGIN_DATE (SHLVL=$SHLVL)"
-
   invokeHook prerun "$@"
 }
 

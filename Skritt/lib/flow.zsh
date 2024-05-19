@@ -33,6 +33,7 @@ invokeHook() {
   shift
   local nameArray="SKRITT_HOOK_$nameHook"
   if [[ "${(P@)#nameArray}" == 0 ]]; then
+    debug "Empty Hook: $nameHook"
     return
   fi
   debug "Invoke Hook: $nameHook"
@@ -55,8 +56,8 @@ SKRITT::FLOW::postparse() {
 }
 
 declare -g SKRITT_BEGIN_DATE="$(date +'%Y-%m-%d %H:%M:%S')"
-declare -ga SKRITT_HOOK_prescript
-SKRITT::FLOW::prescript() {
+declare -ga SKRITT_HOOK_prerun
+SKRITT::FLOW::prerun() {
   if [[ -n "${logfile-}" ]]; then
     setupLog "$logfile" "$logrotate"
   fi
@@ -68,7 +69,12 @@ SKRITT::FLOW::prescript() {
   fi
   info "$SKRITT_BEGIN_DATE (SHLVL=$SHLVL)"
 
-  invokeHook prescript "$@"
+  invokeHook prerun "$@"
+}
+
+declare -ga SKRITT_HOOK_postrun
+SKRITT::FLOW::postrun() {
+  invokeHook postrun "$@"
 }
 
 declare -ga SKRITT_HOOK_exit=()

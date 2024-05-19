@@ -9,7 +9,7 @@ setupArgs() {
   addHook preparse preparse2
   addHook preparse preparse0 begin
   addHook postparse postparse1
-  addHook prescript prescript1
+  addHook prerun prerun1
 }
 
 preparse1() {
@@ -31,8 +31,8 @@ check() {
   return 1
 }
 
-prescript1() {
-  ACCUM+=( "prescript1" )
+prerun1() {
+  ACCUM+=( "prerun1" )
 }
 
 main() {
@@ -43,7 +43,7 @@ main() {
   test "${ACCUM[4]}" '==' "preparse2"
   test "${ACCUM[5]}" '==' "postparse1"
   test "${ACCUM[6]}" '==' "check"
-  test "${ACCUM[7]}" '==' "prescript1"
+  test "${ACCUM[7]}" '==' "prerun1"
 }
 
 source "${0:a:h}/../../skritt"

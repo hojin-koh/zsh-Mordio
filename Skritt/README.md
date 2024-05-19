@@ -134,8 +134,9 @@ check required arguments
 "postparse" hooks
 
 check()
-"prescript" hooks
+"prerun" hooks
 main()
+"postrun" hooks
 "exit" hooks
 ```
 
@@ -153,6 +154,6 @@ If the optional third parameter is "begin", the function will be inserted at the
 
 ### Logging
 
-If built-in option `--logfile` was specified, log text will be written into this file, with automatic log-rotate mechanisms. Note that logging is set up inside the "prescript" phase, so the only proper way to modify this value would be from inside the "postparse" phase.
+If built-in option `--logfile` was specified, log text will be written into this file, with automatic log-rotate mechanisms. Note that logging is set up inside the "prerun" phase, so the only proper way to modify this value would be from inside the "postparse" phase.
 
 By default, 3 old log files will be kept, which are named `logfile.1.zst`, `logfile.2.zst`, and `logfile.3.zst`. This value can be changed with `--logrotate` option.

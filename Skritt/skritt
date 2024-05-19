@@ -68,8 +68,9 @@ if [[ "$check" == "true" ]]; then
   exit 0
 else
   if [[ "$skrittNeedToRun" == "true" || "$force" == "true" ]]; then
-    SKRITT::FLOW::prescript "$@"
+    SKRITT::FLOW::prerun "$@"
     main "$@"
+    SKRITT::FLOW::postrun "$@"
   else
     info "Check passed, no need to run $skrittCommandLineOriginal"
   fi

@@ -59,7 +59,7 @@ MORDIO::TYPE::table::save() {
     mkdir -pv "${__fname%/*}"
   fi
   if [[ "$__fname" == *.zst ]]; then
-    cat | zstd --rsyncable -17 > "$__fname"
+    cat | zstd --rsyncable -19 -T$nj > "$__fname"
   fi
 }
 
@@ -67,8 +67,16 @@ MORDIO::TYPE::table::save() {
 
 MORDIO::TYPE::table::computeMeta() {
   local __fname="$1"
-  printf 'nRecord='
-  MORDIO::TYPE::table::load "$__fname" | wc -l
+  MORDIO::TYPE::table::load "$__fname" \
+    | LC_ALL=en_US.UTF-8 gawk -F$'\t' '
+        {l1+=length($1); l2+=length($2)}
+        END {
+          print "nRecord=" NR;
+          print "nCharID=" l1;
+          print "nChar=" l2;
+          print "avgCharID=" l1/NR;
+          print "avgChar=" l2/NR;
+        }'
 }
 
 MORDIO::TYPE::table::saveMeta() {

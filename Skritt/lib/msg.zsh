@@ -79,5 +79,5 @@ showReadableTime() {
 
 lineProgressBar() {
   local nLineTotal="$1"
-  pv -l -F "%t %b/$nLineTotal %p %e" -i 2 -s $nLineTotal
+  pv -l -F "%t %b/$nLineTotal %p %e" -i 2 -s $nLineTotal -S
 }

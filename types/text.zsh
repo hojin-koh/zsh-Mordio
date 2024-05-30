@@ -12,67 +12,60 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Type definition: table
-# Table is a series of id/contents rows, separated by tabs
+# Type definition: text
+# Text is a series of id/text pair, separated by a tab
 
-mordioTypeInit[table]=MORDIO::TYPE::table::INIT
+mordioTypeInit[table]=MORDIO::TYPE::text::INIT
 
-MORDIO::TYPE::table::INIT() {
+MORDIO::TYPE::text::INIT() {
   local __nameVar="$1"
   local __inout="$2"
 
-  populateType "$__nameVar" MORDIO::TYPE::table
+  populateType "$__nameVar" MORDIO::TYPE::text
 }
 
-MORDIO::TYPE::table::checkName() {
+MORDIO::TYPE::text::checkName() {
   local __fname="$1"
-  if [[ "$__fname" == *.zst ]]; then
+  if [[ "$__fname" == *.txt.zst ]]; then
     true
   else
     err "Input argument $__fname has invalid extension" 36
   fi
 }
 
-MORDIO::TYPE::table::checkValid() {
-  local __fname="$1"
-  if [[ ! -r "$__fname" ]]; then
-    err "Input argument $__fname does not exist" 36
-  fi
-  if [[ ! -r "$__fname.meta" ]]; then
-    err "Input argument $__fname has no metadata" 36
-  fi
+MORDIO::TYPE::text::checkValid() {
+  MORDIO::TYPE::table::checkValid "$@"
 }
 
-MORDIO::TYPE::table::load() {
+MORDIO::TYPE::text::load() {
   local __fname="$1"
-  if [[ "$__fname" == *.zst ]]; then
+  if [[ "$__fname" == *.txt.zst ]]; then
     zstd -dc "$__fname"
   fi
 }
 
-MORDIO::TYPE::table::save() {
+MORDIO::TYPE::text::save() {
   local __fname="$1"
   if [[ "$__fname" == */* ]]; then
     mkdir -pv "${__fname%/*}"
   fi
-  if [[ "$__fname" == *.zst ]]; then
+  if [[ "$__fname" == *.txt.zst ]]; then
     zstd --rsyncable -19 -T$nj > "$__fname"
   fi
 }
 
 # Metadata
 
-MORDIO::TYPE::table::computeMeta() {
+MORDIO::TYPE::text::computeMeta() {
   local __fname="$1"
-  MORDIO::TYPE::table::load "$__fname" \
+  MORDIO::TYPE::text::load "$__fname" \
     | LC_ALL=en_US.UTF-8 gawk -F$'\t' '
         END {
           print "nRecord=" NR;
-          print "nField=" NF;
         }'
 }
 
-MORDIO::TYPE::table::saveMeta() {
+MORDIO::TYPE::text::saveMeta() {
   local __fname="$1"
   if [[ "$__fname" == */* ]]; then
     mkdir -pv "${__fname%/*}"
@@ -80,12 +73,7 @@ MORDIO::TYPE::table::saveMeta() {
   cat > "$__fname.meta"
 }
 
-MORDIO::TYPE::table::getNR() {
+MORDIO::TYPE::text::getNR() {
   local __fname="$1"
   gawk -F= '/^nRecord=/ {print $2} /^---$/ {exit}' "$__fname.meta"
-}
-
-MORDIO::TYPE::table::getNF() {
-  local __fname="$1"
-  gawk -F= '/^nField=/ {print $2} /^---$/ {exit}' "$__fname.meta"
 }

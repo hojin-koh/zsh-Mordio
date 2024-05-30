@@ -15,25 +15,27 @@
 # Type definition: table
 # Table is a series of id/contents rows, separated by tabs
 
-mordioTypeInit[table]=MORDIO::TYPE::table::INIT
+mordioTypeInit[table]=MORDIO::TYPE::csv::INIT
 
-MORDIO::TYPE::table::INIT() {
+MORDIO::TYPE::csv::INIT() {
   local __nameVar="$1"
   local __inout="$2"
 
-  populateType "$__nameVar" MORDIO::TYPE::table
+  populateType "$__nameVar" MORDIO::TYPE::csv
 }
 
-MORDIO::TYPE::table::checkName() {
+MORDIO::TYPE::csv::checkName() {
   local __fname="$1"
-  if [[ "$__fname" == *.zst ]]; then
+  if [[ "$__fname" == *.csv ]]; then
+    true
+  elif [[ "$__fname" == *.csv.zst ]]; then
     true
   else
     err "Input argument $__fname has invalid extension" 36
   fi
 }
 
-MORDIO::TYPE::table::checkValid() {
+MORDIO::TYPE::csv::checkValid() {
   local __fname="$1"
   if [[ ! -r "$__fname" ]]; then
     err "Input argument $__fname does not exist" 36
@@ -43,36 +45,36 @@ MORDIO::TYPE::table::checkValid() {
   fi
 }
 
-MORDIO::TYPE::table::load() {
+MORDIO::TYPE::csv::load() {
   local __fname="$1"
-  if [[ "$__fname" == *.zst ]]; then
+  if [[ "$__fname" == *.csv.zst ]]; then
     zstd -dc "$__fname"
+  elif [[ "$__fname" == *.csv ]]; then
+    cat "$__fname"
   fi
 }
 
-MORDIO::TYPE::table::save() {
+MORDIO::TYPE::csv::save() {
   local __fname="$1"
   if [[ "$__fname" == */* ]]; then
     mkdir -pv "${__fname%/*}"
   fi
-  if [[ "$__fname" == *.zst ]]; then
+  if [[ "$__fname" == *.csv.zst ]]; then
     zstd --rsyncable -19 -T$nj > "$__fname"
+  elif [[ "$__fname" == *.csv ]]; then
+    cat > "$__fname"
   fi
 }
 
 # Metadata
 
-MORDIO::TYPE::table::computeMeta() {
+MORDIO::TYPE::csv::computeMeta() {
   local __fname="$1"
-  MORDIO::TYPE::table::load "$__fname" \
-    | LC_ALL=en_US.UTF-8 gawk -F$'\t' '
-        END {
-          print "nRecord=" NR;
-          print "nField=" NF;
-        }'
+  MORDIO::TYPE::csv::load "$__fname" \
+    | python3 -c "import csv; import sys; r = list(csv.reader(sys.stdin)); print(f'nRow={len(r)}\nnCol={len(r[0] if len(r)>0 else [])}')"
 }
 
-MORDIO::TYPE::table::saveMeta() {
+MORDIO::TYPE::csv::saveMeta() {
   local __fname="$1"
   if [[ "$__fname" == */* ]]; then
     mkdir -pv "${__fname%/*}"
@@ -80,12 +82,12 @@ MORDIO::TYPE::table::saveMeta() {
   cat > "$__fname.meta"
 }
 
-MORDIO::TYPE::table::getNR() {
+MORDIO::TYPE::csv::getNR() {
   local __fname="$1"
-  gawk -F= '/^nRecord=/ {print $2} /^---$/ {exit}' "$__fname.meta"
+  gawk -F= '/^nRow=/ {print $2} /^---$/ {exit}' "$__fname.meta"
 }
 
-MORDIO::TYPE::table::getNF() {
+MORDIO::TYPE::csv::getNC() {
   local __fname="$1"
-  gawk -F= '/^nField=/ {print $2} /^---$/ {exit}' "$__fname.meta"
+  gawk -F= '/^nCol=/ {print $2} /^---$/ {exit}' "$__fname.meta"
 }

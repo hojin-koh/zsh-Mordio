@@ -19,7 +19,9 @@ declare -gA mordioMapOptDirection
 declare -gA mordioMapOptType
 
 # Register all types
-source "$MORDIO_ROOT_DIR/types"/*.zsh
+for f in "$MORDIO_ROOT_DIR/types"/*.zsh; do
+  source "$f"
+done
 
 optType() {
   local __nameVar="$1"

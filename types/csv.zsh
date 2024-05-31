@@ -15,7 +15,7 @@
 # Type definition: table
 # Table is a series of id/contents rows, separated by tabs
 
-mordioTypeInit[table]=MORDIO::TYPE::csv::INIT
+mordioTypeInit[csv]=MORDIO::TYPE::csv::INIT
 
 MORDIO::TYPE::csv::INIT() {
   local __nameVar="$1"

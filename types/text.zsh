@@ -15,7 +15,7 @@
 # Type definition: text
 # Text is a series of id/text pair, separated by a tab
 
-mordioTypeInit[table]=MORDIO::TYPE::text::INIT
+mordioTypeInit[text]=MORDIO::TYPE::text::INIT
 
 MORDIO::TYPE::text::INIT() {
   local __nameVar="$1"

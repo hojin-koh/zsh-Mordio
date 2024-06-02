@@ -56,8 +56,18 @@ MORDIO::TYPE::table::save() {
     mkdir -pv "${__fname%/*}"
   fi
   if [[ "$__fname" == *.zst ]]; then
-    zstd --rsyncable -19 -T$nj > "$__fname"
+    zstd --rsyncable -19 -T$nj > "$__fname.tmp"
   fi
+}
+
+MORDIO::TYPE::table::finalize() {
+  local __fname="$1"
+  mv -vf "$__fname.tmp" "$__fname"
+}
+
+MORDIO::TYPE::table::cleanup() {
+  local __fname="$1"
+  rm -vf "$__fname.tmp"
 }
 
 # Metadata

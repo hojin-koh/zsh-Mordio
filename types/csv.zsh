@@ -60,10 +60,20 @@ MORDIO::TYPE::csv::save() {
     mkdir -pv "${__fname%/*}"
   fi
   if [[ "$__fname" == *.csv.zst ]]; then
-    zstd --rsyncable -19 -T$nj > "$__fname"
+    zstd --rsyncable -19 -T$nj > "$__fname.tmp"
   elif [[ "$__fname" == *.csv ]]; then
-    cat > "$__fname"
+    cat > "$__fname.tmp"
   fi
+}
+
+MORDIO::TYPE::csv::finalize() {
+  local __fname="$1"
+  mv -vf "$__fname.tmp" "$__fname"
+}
+
+MORDIO::TYPE::csv::cleanup() {
+  local __fname="$1"
+  rm -vf "$__fname.tmp"
 }
 
 # Metadata

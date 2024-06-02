@@ -50,6 +50,12 @@ populateType() {
     if [[ "$stem" == INIT ]]; then continue; fi
     eval "${__nameVar}::${stem}() { ${__namespace}::${stem} \"\$$__nameVar\" }"
   done
+
+  if [[ "${mordioMapOptDirection[$__nameVar]}" == "output" ]]; then
+    if declare -f "${__nameVar}::cleanup" >/dev/null; then
+      addHook exit "${__nameVar}::cleanup"
+    fi
+  fi
 }
 
 MORDIO::FLOW::checkArgs() {
@@ -67,6 +73,7 @@ MORDIO::FLOW::writeMeta() {
   local arg
   for arg in "${(k)mordioMapOptType[@]}"; do
     if [[ "${mordioMapOptDirection[$arg]}" == "input" ]]; then continue; fi
+    ${arg}::finalize
     (
       ${arg}::computeMeta
       printf '\n---\n\n'

@@ -84,6 +84,7 @@ TRAPEXIT() {
   else
     err "< ($(showReadableTime $SECONDS)) End with error ($rtn) $ZSH_ARGZERO"
   fi
+  echo >&5 # a new line after ending
 }
 
 TRAPINT() {

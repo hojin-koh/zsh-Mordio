@@ -11,10 +11,10 @@
 # Option format is: --option-name=arg or option-name=arg
 # and shell variable "option_name" gets set to value "arg"
 # The exceptions are --help|-h, which takes no arguments, but prints the
-# $skrittHelpMessage variable (if defined), and --config, which reads a config file as options
+# help message, and --config, which reads a config file as options
 
 __::errexit() {
-  printf "%s" "$skrittHelpMessage" | column -tLs $'\t' >&2
+  printHelpMessage
   printf '%.0s-' {1..75} >&2
   printf '\n' >&2
   echo "Error: $1" >&2

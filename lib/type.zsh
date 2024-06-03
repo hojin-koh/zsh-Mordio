@@ -29,7 +29,7 @@ optType() {
   local __type="$3"
 
   if [[ "$__inout" != "input" && "$__inout" != "output" ]]; then
-    err "Invalid type for option $__nameVar: $__type" 35
+    err "Invalid in/out for option $__nameVar: $__type" 35
   fi
   if [[ -z "${mordioTypeInit[$__type]-}" ]]; then
     err "Type $__type for option $__nameVar doesn't exist" 35
@@ -48,22 +48,30 @@ populateType() {
   for func in ${(ok)functions[(I)${__namespace}::*]}; do
     local stem="${func##*::}"
     if [[ "$stem" == INIT ]]; then continue; fi
-    eval "${__nameVar}::${stem}() { ${__namespace}::${stem} \"\$$__nameVar\" }"
+    if [[ "${(Pt)__nameVar}" == "array" ]]; then
+      eval "${__nameVar}::${stem}() { local __i=\"\$1\"; ${__namespace}::${stem} \"\${${__nameVar}[\$__i]}\" }"
+      eval "${__nameVar}::ALL::${stem}() { local __i; for (( __i=1; __i<=\${#${__nameVar}[@]}; __i++ )); do ${__nameVar}::${stem} \$__i; done }"
+    elif [[ "${(Pt)__nameVar}" == "scalar" ]]; then 
+      eval "${__nameVar}::${stem}() { ${__namespace}::${stem} \"\$$__nameVar\" }"
+      eval "${__nameVar}::ALL::${stem}() { ${__namespace}::${stem} \"\$$__nameVar\" }"
+    fi
   done
 
   if [[ "${mordioMapOptDirection[$__nameVar]}" == "output" ]]; then
     if declare -f "${__nameVar}::cleanup" >/dev/null; then
-      addHook exit "${__nameVar}::cleanup"
+      addHook exit "${__nameVar}::ALL::cleanup"
     fi
   fi
 }
 
 MORDIO::FLOW::checkArgs() {
   local arg
+  local __i
   for arg in "${(k)mordioMapOptType[@]}"; do
-    ${arg}::checkName
+    ${arg}::ALL::checkName $__i
+
     if [[ "${mordioMapOptDirection[$arg]}" == "input" ]]; then
-      ${arg}::checkValid
+      ${arg}::ALL::checkValid $__i
     fi
   done
 }
@@ -71,23 +79,32 @@ addHook postparse MORDIO::FLOW::checkArgs
 
 MORDIO::FLOW::writeMeta() {
   local arg
+  local __i
   for arg in "${(k)mordioMapOptType[@]}"; do
     if [[ "${mordioMapOptDirection[$arg]}" == "input" ]]; then continue; fi
-    ${arg}::finalize
-    (
-      ${arg}::computeMeta
-      printf '\n---\n\n'
-      date +'%Y-%m-%d %H:%M:%S'
-      printf '\n'
-      local grp
-      local var
-      for grp in "" "${skrittOptGroups[@]}" "Skritt"; do
-        if [[ -n "$grp" ]]; then printf "\n# %s Options:\n" "$grp"; fi
-        for var in ${(k)skrittMapOptGroup[(R)$grp]}; do
-          printf "%s=%s\n" "$var" "${(P@)var-}"
+
+    ${arg}::ALL::finalize $__i
+    for (( __i=1; __i<=${#${(A)${(P)arg}}[@]}; __i++ )); do
+      (
+        ${arg}::computeMeta $__i
+        printf '\n---\n\n'
+        date +'%Y-%m-%d %H:%M:%S'
+        printf '@ %s\n\n' "${HOST-${HOSTNAME-}}"
+        local grp
+        local var
+        for grp in "" "${skrittOptGroups[@]}" "Skritt"; do
+          if [[ -n "$grp" ]]; then printf "\n# %s Options:\n" "$grp"; fi
+          for var in ${(k)skrittMapOptGroup[(R)$grp]}; do
+            if [[ "${(Pt)var}" == "array" ]]; then
+              printf "%s=(%s)\n" "$var" "${(P*)var-}"
+            else
+              printf "%s=%s\n" "$var" "${(P)var-}"
+            fi
+          done
         done
-      done
-    ) | ${arg}::saveMeta
+      ) | ${arg}::saveMeta $__i
+    done
+
   done
 }
 addHook postrun MORDIO::FLOW::writeMeta

@@ -34,7 +34,11 @@ debug() {
 }
 
 titleinfo() {
-  SKRITT::INTERNAL::outputMessage T '1;32' "$1"
+  if [[ "$1" == ">"* ]]; then
+    SKRITT::INTERNAL::outputMessage T '1;35' "$1"
+  else
+    SKRITT::INTERNAL::outputMessage T '1;32' "$1"
+  fi
 }
 
 info() {

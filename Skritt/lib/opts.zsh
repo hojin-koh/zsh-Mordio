@@ -101,7 +101,7 @@ SKRITT::HOOK::logOptions() {
   local var
   for var in "${(@)skrittOpts}"; do
     if [[ "${(Pt)var-}" == "array" ]]; then
-      debug "option:$var=(${(P@)var-})"
+      debug "option:$var=(${(P*)var-})"
     else
       debug "option:$var=${(P)var-}"
     fi

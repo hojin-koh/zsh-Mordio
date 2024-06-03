@@ -67,6 +67,7 @@ SKRITT::FLOW::prerun() {
   else
     titleinfo "> ($SKRITT_BEGIN_DATE) Begin $$ $ZSH_ARGZERO $@"
   fi
+  debug "@ ${HOST-${HOSTNAME-}}"
   invokeHook prerun "$@"
 }
 

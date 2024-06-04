@@ -56,7 +56,7 @@ MORDIO::TYPE::table::save() {
     mkdir -pv "${__fname%/*}"
   fi
   if [[ "$__fname" == *.zst ]]; then
-    zstd --rsyncable -19 -T$nj > "$__fname.tmp"
+    zstd --rsyncable -11 -T$nj > "$__fname.tmp"
   fi
 }
 

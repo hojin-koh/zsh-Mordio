@@ -44,16 +44,16 @@ populateType() {
   local __nameVar="$1"
   local __namespace="$2"
 
-  local func
-  for func in ${(ok)functions[(I)${__namespace}::*]}; do
-    local stem="${func##*::}"
-    if [[ "$stem" == INIT ]]; then continue; fi
+  local __func
+  for __func in ${(ok)functions[(I)${__namespace}::*]}; do
+    local __stem="${__func##*::}"
+    if [[ "$__stem" == INIT ]]; then continue; fi
     if [[ "${(Pt)__nameVar}" == "array" ]]; then
-      eval "${__nameVar}::${stem}() { local __i=\"\$1\"; ${__namespace}::${stem} \"\${${__nameVar}[\$__i]}\" \"\$@\" }"
-      eval "${__nameVar}::ALL::${stem}() { local __i; for (( __i=1; __i<=\${#${__nameVar}[@]}; __i++ )); do ${__nameVar}::${stem} \"\$__i\" \"\$@\"; done }"
+      eval "${__nameVar}::${__stem}() { local __i=\"\$1\"; ${__namespace}::${__stem} \"\${${__nameVar}[\$__i]}\" \"\$@\" }"
+      eval "${__nameVar}::ALL::${__stem}() { local __i; for (( __i=1; __i<=\${#${__nameVar}[@]}; __i++ )); do ${__nameVar}::${__stem} \"\$__i\" \"\$@\"; done }"
     elif [[ "${(Pt)__nameVar}" == "scalar" ]]; then 
-      eval "${__nameVar}::${stem}() { ${__namespace}::${stem} \"\$$__nameVar\" \"\$@\" }"
-      eval "${__nameVar}::ALL::${stem}() { ${__namespace}::${stem} \"\$$__nameVar\" \"\$@\" }"
+      eval "${__nameVar}::${__stem}() { ${__namespace}::${__stem} \"\$$__nameVar\" \"\$@\" }"
+      eval "${__nameVar}::ALL::${__stem}() { ${__namespace}::${__stem} \"\$$__nameVar\" \"\$@\" }"
     fi
   done
 
@@ -66,27 +66,27 @@ populateType() {
 
 MORDIO::FLOW::checkArgs() {
   local arg
-  local __i
+  local i
   for arg in "${(k)mordioMapOptType[@]}"; do
-    ${arg}::ALL::checkName $__i
+    ${arg}::ALL::checkName $i
 
     if [[ "${mordioMapOptDirection[$arg]}" == "input" ]]; then
-      ${arg}::ALL::checkValid $__i
+      ${arg}::ALL::checkValid $i
     fi
   done
 }
 addHook postparse MORDIO::FLOW::checkArgs
 
 MORDIO::FLOW::writeMeta() {
-  local arg
+  local __arg
   local __i
-  for arg in "${(k)mordioMapOptType[@]}"; do
-    if [[ "${mordioMapOptDirection[$arg]}" == "input" ]]; then continue; fi
+  for __arg in "${(k)mordioMapOptType[@]}"; do
+    if [[ "${mordioMapOptDirection[$__arg]}" == "input" ]]; then continue; fi
 
-    ${arg}::ALL::finalize $__i
-    for (( __i=1; __i<=${#${(A)${(P)arg}}[@]}; __i++ )); do
+    ${__arg}::ALL::finalize $__i
+    for (( __i=1; __i<=${#${(A)${(P)__arg}}[@]}; __i++ )); do
       (
-        ${arg}::computeMeta $__i
+        ${__arg}::computeMeta $__i
         printf '\n---\n\n'
         date +'%Y-%m-%d %H:%M:%S'
         printf '@ %s\n\n' "${HOST-${HOSTNAME-}}"
@@ -102,7 +102,7 @@ MORDIO::FLOW::writeMeta() {
             fi
           done
         done
-      ) | ${arg}::saveMeta $__i
+      ) | ${__arg}::saveMeta $__i
     done
 
   done

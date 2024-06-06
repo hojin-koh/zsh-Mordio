@@ -49,11 +49,11 @@ populateType() {
     local stem="${func##*::}"
     if [[ "$stem" == INIT ]]; then continue; fi
     if [[ "${(Pt)__nameVar}" == "array" ]]; then
-      eval "${__nameVar}::${stem}() { local __i=\"\$1\"; ${__namespace}::${stem} \"\${${__nameVar}[\$__i]}\" }"
-      eval "${__nameVar}::ALL::${stem}() { local __i; for (( __i=1; __i<=\${#${__nameVar}[@]}; __i++ )); do ${__nameVar}::${stem} \$__i; done }"
+      eval "${__nameVar}::${stem}() { local __i=\"\$1\"; ${__namespace}::${stem} \"\${${__nameVar}[\$__i]}\" \"\$@\" }"
+      eval "${__nameVar}::ALL::${stem}() { local __i; for (( __i=1; __i<=\${#${__nameVar}[@]}; __i++ )); do ${__nameVar}::${stem} \"\$__i\" \"\$@\"; done }"
     elif [[ "${(Pt)__nameVar}" == "scalar" ]]; then 
-      eval "${__nameVar}::${stem}() { ${__namespace}::${stem} \"\$$__nameVar\" }"
-      eval "${__nameVar}::ALL::${stem}() { ${__namespace}::${stem} \"\$$__nameVar\" }"
+      eval "${__nameVar}::${stem}() { ${__namespace}::${stem} \"\$$__nameVar\" \"\$@\" }"
+      eval "${__nameVar}::ALL::${stem}() { ${__namespace}::${stem} \"\$$__nameVar\" \"\$@\" }"
     fi
   done
 

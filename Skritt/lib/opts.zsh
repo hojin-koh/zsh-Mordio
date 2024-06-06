@@ -23,47 +23,47 @@ declare -gA skrittMapOptDesc
 # The utility to declare an option
 # Usage: opt [-r] [-<Group Name>] <opt-name> <default-value> <description>
 opt() {
-  local isRequired=false
+  local __isRequired=false
   if [[ "${1-}" == "-r" ]]; then
-    isRequired=true
+    __isRequired=true
     shift
   fi
   # A group is specified
-  local grp=""
+  local __grpThis=""
   if [[ "${1-}" == -* ]]; then
-    grp="${1:1}"
+    __grpThis="${1:1}"
     shift
   fi
-  local nameOpt="$1"
-  local nameVar="${nameOpt//-/_}"
-  local nameVar="${nameVar//./___}"
-  local valueDefault="$2"
-  local descOpt="$3"
-  skrittOpts+=( "$nameVar" )
+  local __nameOpt="$1"
+  local __nameVar="${__nameOpt//-/_}"
+  local __nameVar="${__nameVar//./___}"
+  local __valueDefault="$2"
+  local __descOpt="$3"
+  skrittOpts+=( "$__nameVar" )
 
   # Write the description of this option
-  if [[ "$isRequired" == true ]]; then
-    skrittMapOptDesc[$nameVar]="[Req]$nameOpt=$valueDefault"$'\t'"$descOpt"
-    skrittRequiredArgs+=( "$nameVar" )
+  if [[ "$__isRequired" == true ]]; then
+    skrittMapOptDesc[$__nameVar]="[Req]$__nameOpt=$__valueDefault"$'\t'"$__descOpt"
+    skrittRequiredArgs+=( "$__nameVar" )
   else
-    skrittMapOptDesc[$nameVar]="[--]$nameOpt=$valueDefault"$'\t'"$descOpt"
+    skrittMapOptDesc[$__nameVar]="[--]$__nameOpt=$__valueDefault"$'\t'"$__descOpt"
   fi
 
   # Take note of group, and add to group list if not yet done
-  skrittMapOptGroup[$nameVar]="$grp"
-  if [[ ${skrittOptGroups[(i)$grp]} -gt ${#skrittOptGroups} ]]; then
-    if [[ -n "$grp" && "$grp" != "Skritt" ]]; then
-      skrittOptGroups+=( "$grp" )
+  skrittMapOptGroup[$__nameVar]="$__grpThis"
+  if [[ ${skrittOptGroups[(i)$__grpThis]} -gt ${#skrittOptGroups} ]]; then
+    if [[ -n "$__grpThis" && "$__grpThis" != "Skritt" ]]; then
+      skrittOptGroups+=( "$__grpThis" )
     fi
   fi
 
   # Make the variable and assign it the default value
-  if [[ "$valueDefault" == "("* ]]; then
-    declare -ga "$nameVar"
-    eval "$nameVar=$valueDefault"
+  if [[ "$__valueDefault" == "("* ]]; then
+    declare -ga "$__nameVar"
+    eval "$__nameVar=$__valueDefault"
   else
-    declare -g "$nameVar"
-    eval "$nameVar='$valueDefault'"
+    declare -g "$__nameVar"
+    eval "$__nameVar='$__valueDefault'"
   fi
 }
 
@@ -82,15 +82,15 @@ printHelpMessage() {
 }
 
 checkRequiredArgs() {
-  local var
-  for var in "${(@)skrittRequiredArgs}"; do
-    if [[ -z "${(P)var-}" ]]; then
+  local __var
+  for __var in "${(@)skrittRequiredArgs}"; do
+    if [[ -z "${(P)__var-}" ]]; then
       if [[ "${1+ok}" == "ok" ]]; then
-        eval "$var='$1'"
-        debug "Filled required argument \$$var with positional argument '$1'"
+        eval "$__var='$1'"
+        debug "Filled required argument \$$__var with positional argument '$1'"
         shift
       else
-        err "Required argument \$$var not specified" 1
+        err "Required argument \$$__var not specified" 1
       fi
     fi
   done
@@ -98,12 +98,12 @@ checkRequiredArgs() {
 addHook postparse checkRequiredArgs
 
 SKRITT::HOOK::logOptions() {
-  local var
-  for var in "${(@)skrittOpts}"; do
-    if [[ "${(Pt)var-}" == "array" ]]; then
-      debug "option:$var=(${(P*)var-})"
+  local __var
+  for __var in "${(@)skrittOpts}"; do
+    if [[ "${(Pt)__var-}" == "array" ]]; then
+      debug "option:$__var=(${(P*)__var-})"
     else
-      debug "option:$var=${(P)var-}"
+      debug "option:$__var=${(P)__var-}"
     fi
   done
 }

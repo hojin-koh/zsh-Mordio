@@ -18,82 +18,82 @@
 mordioTypeInit[arpa]=MORDIO::TYPE::arpa::INIT
 
 MORDIO::TYPE::arpa::INIT() {
-  local __nameVar="$1"
-  local __inout="$2"
+  local nameVar="$1"
+  local inout="$2"
 
-  populateType "$__nameVar" MORDIO::TYPE::arpa
+  populateType "$nameVar" MORDIO::TYPE::arpa
 }
 
 MORDIO::TYPE::arpa::checkName() {
-  local __fname="$1"
-  if [[ "$__fname" == *.arpa ]]; then
+  local fname="$1"
+  if [[ "$fname" == *.arpa ]]; then
     true
-  elif [[ "$__fname" == *.arpa.zst ]]; then
+  elif [[ "$fname" == *.arpa.zst ]]; then
     true
   else
-    err "Input argument $__fname has invalid extension" 36
+    err "Input argument $fname has invalid extension" 36
   fi
 }
 
 MORDIO::TYPE::arpa::checkValid() {
-  local __fname="$1"
-  if [[ ! -r "$__fname" ]]; then
-    err "Input argument $__fname does not exist" 36
+  local fname="$1"
+  if [[ ! -r "$fname" ]]; then
+    err "Input argument $fname does not exist" 36
   fi
-  if [[ ! -r "$__fname.meta" ]]; then
-    err "Input argument $__fname has no metadata" 36
+  if [[ ! -r "$fname.meta" ]]; then
+    err "Input argument $fname has no metadata" 36
   fi
 }
 
 MORDIO::TYPE::arpa::load() {
-  local __fname="$1"
-  if [[ "$__fname" == *.arpa.zst ]]; then
-    zstd -dc "$__fname"
-  elif [[ "$__fname" == *.arpa ]]; then
-    gzip -c "$__fname"
+  local fname="$1"
+  if [[ "$fname" == *.arpa.zst ]]; then
+    zstd -dc "$fname"
+  elif [[ "$fname" == *.arpa ]]; then
+    gzip -c "$fname"
   fi
 }
 
 MORDIO::TYPE::arpa::save() {
-  local __fname="$1"
-  local __input="$2"
-  if [[ "$__fname" == */* ]]; then
-    mkdir -pv "${__fname%/*}"
+  local fname="$1"
+  local input="$2"
+  if [[ "$fname" == */* ]]; then
+    mkdir -pv "${fname%/*}"
   fi
-  if [[ "$__fname" == *.arpa.zst ]]; then
-    gunzip -c "$__input" > "$__fname.tmp"
-    zstd --rm -17 -T$nj "$__fname.tmp"
-  elif [[ "$__fname" == *.arpa ]]; then
-    gunzip -c "$__input" > "$__fname.tmp"
+  if [[ "$fname" == *.arpa.zst ]]; then
+    gunzip -c "$input" > "$fname.tmp"
+    zstd --rm -17 -T$nj "$fname.tmp"
+  elif [[ "$fname" == *.arpa ]]; then
+    gunzip -c "$input" > "$fname.tmp"
   fi
 }
 
 MORDIO::TYPE::arpa::finalize() {
-  local __fname="$1"
-  if [[ -f "$__fname.tmp" ]]; then
-    mv -vf "$__fname.tmp" "$__fname"
-  elif [[ -f "$__fname.tmp.zst" ]]; then
-    mv -vf "$__fname.tmp.zst" "$__fname"
+  local fname="$1"
+  if [[ -f "$fname.tmp" ]]; then
+    mv -vf "$fname.tmp" "$fname"
+  elif [[ -f "$fname.tmp.zst" ]]; then
+    mv -vf "$fname.tmp.zst" "$fname"
   fi
 }
 
 MORDIO::TYPE::arpa::cleanup() {
-  local __fname="$1"
-  rm -vf "$__fname.tmp"
-  rm -vf "$__fname.tmp.zst"
+  local fname="$1"
+  rm -vf "$fname.tmp"
+  rm -vf "$fname.tmp.zst"
 }
 
 # Metadata
 
 MORDIO::TYPE::arpa::computeMeta() {
-  local __fname="$1"
+  local fname="$1"
   true
 }
 
 MORDIO::TYPE::arpa::saveMeta() {
-  local __fname="$1"
-  if [[ "$__fname" == */* ]]; then
-    mkdir -pv "${__fname%/*}"
+  local fname="$1"
+  if [[ "$fname" == */* ]]; then
+    mkdir -pv "${fname%/*}"
   fi
-  cat > "$__fname.meta"
+  cat > "$fname.meta"
 }

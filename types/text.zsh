@@ -18,18 +18,18 @@
 mordioTypeInit[text]=MORDIO::TYPE::text::INIT
 
 MORDIO::TYPE::text::INIT() {
-  local __nameVar="$1"
-  local __inout="$2"
+  local nameVar="$1"
+  local inout="$2"
 
-  populateType "$__nameVar" MORDIO::TYPE::text
+  populateType "$nameVar" MORDIO::TYPE::text
 }
 
 MORDIO::TYPE::text::checkName() {
-  local __fname="$1"
-  if [[ "$__fname" == *.txt.zst ]]; then
+  local fname="$1"
+  if [[ "$fname" == *.txt.zst ]]; then
     true
   else
-    err "Input argument $__fname has invalid extension" 36
+    err "Input argument $fname has invalid extension" 36
   fi
 }
 
@@ -38,19 +38,19 @@ MORDIO::TYPE::text::checkValid() {
 }
 
 MORDIO::TYPE::text::load() {
-  local __fname="$1"
-  if [[ "$__fname" == *.txt.zst ]]; then
-    zstd -dc "$__fname"
+  local fname="$1"
+  if [[ "$fname" == *.txt.zst ]]; then
+    zstd -dc "$fname"
   fi
 }
 
 MORDIO::TYPE::text::save() {
-  local __fname="$1"
-  if [[ "$__fname" == */* ]]; then
-    mkdir -pv "${__fname%/*}"
+  local fname="$1"
+  if [[ "$fname" == */* ]]; then
+    mkdir -pv "${fname%/*}"
   fi
-  if [[ "$__fname" == *.txt.zst ]]; then
-    zstd --rsyncable -11 -T$nj > "$__fname.tmp"
+  if [[ "$fname" == *.txt.zst ]]; then
+    zstd --rsyncable -11 -T$nj > "$fname.tmp"
   fi
 }
 
@@ -65,8 +65,8 @@ MORDIO::TYPE::text::cleanup() {
 # Metadata
 
 MORDIO::TYPE::text::computeMeta() {
-  local __fname="$1"
-  MORDIO::TYPE::text::load "$__fname" \
+  local fname="$1"
+  MORDIO::TYPE::text::load "$fname" \
     | LC_ALL=en_US.UTF-8 gawk -F$'\t' '
         END {
           print "nRecord=" NR;
@@ -74,14 +74,14 @@ MORDIO::TYPE::text::computeMeta() {
 }
 
 MORDIO::TYPE::text::saveMeta() {
-  local __fname="$1"
-  if [[ "$__fname" == */* ]]; then
-    mkdir -pv "${__fname%/*}"
+  local fname="$1"
+  if [[ "$fname" == */* ]]; then
+    mkdir -pv "${fname%/*}"
   fi
-  cat > "$__fname.meta"
+  cat > "$fname.meta"
 }
 
 MORDIO::TYPE::text::getNR() {
-  local __fname="$1"
-  gawk -F= '/^nRecord=/ {print $2} /^---$/ {exit}' "$__fname.meta"
+  local fname="$1"
+  gawk -F= '/^nRecord=/ {print $2} /^---$/ {exit}' "$fname.meta"
 }

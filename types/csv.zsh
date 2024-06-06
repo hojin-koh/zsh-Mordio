@@ -12,92 +12,92 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Type definition: table
+# Type definition: csv
 # Table is a series of id/contents rows, separated by tabs
 
 mordioTypeInit[csv]=MORDIO::TYPE::csv::INIT
 
 MORDIO::TYPE::csv::INIT() {
-  local __nameVar="$1"
-  local __inout="$2"
+  local nameVar="$1"
+  local inout="$2"
 
-  populateType "$__nameVar" MORDIO::TYPE::csv
+  populateType "$nameVar" MORDIO::TYPE::csv
 }
 
 MORDIO::TYPE::csv::checkName() {
-  local __fname="$1"
-  if [[ "$__fname" == *.csv ]]; then
+  local fname="$1"
+  if [[ "$fname" == *.csv ]]; then
     true
-  elif [[ "$__fname" == *.csv.zst ]]; then
+  elif [[ "$fname" == *.csv.zst ]]; then
     true
   else
-    err "Input argument $__fname has invalid extension" 36
+    err "Input argument $fname has invalid extension" 36
   fi
 }
 
 MORDIO::TYPE::csv::checkValid() {
-  local __fname="$1"
-  if [[ ! -r "$__fname" ]]; then
-    err "Input argument $__fname does not exist" 36
+  local fname="$1"
+  if [[ ! -r "$fname" ]]; then
+    err "Input argument $fname does not exist" 36
   fi
-  if [[ ! -r "$__fname.meta" ]]; then
-    err "Input argument $__fname has no metadata" 36
+  if [[ ! -r "$fname.meta" ]]; then
+    err "Input argument $fname has no metadata" 36
   fi
 }
 
 MORDIO::TYPE::csv::load() {
-  local __fname="$1"
-  if [[ "$__fname" == *.csv.zst ]]; then
-    zstd -dc "$__fname"
-  elif [[ "$__fname" == *.csv ]]; then
-    cat "$__fname"
+  local fname="$1"
+  if [[ "$fname" == *.csv.zst ]]; then
+    zstd -dc "$fname"
+  elif [[ "$fname" == *.csv ]]; then
+    cat "$fname"
   fi
 }
 
 MORDIO::TYPE::csv::save() {
-  local __fname="$1"
-  if [[ "$__fname" == */* ]]; then
-    mkdir -pv "${__fname%/*}"
+  local fname="$1"
+  if [[ "$fname" == */* ]]; then
+    mkdir -pv "${fname%/*}"
   fi
-  if [[ "$__fname" == *.csv.zst ]]; then
-    zstd --rsyncable -19 -T$nj > "$__fname.tmp"
-  elif [[ "$__fname" == *.csv ]]; then
-    cat > "$__fname.tmp"
+  if [[ "$fname" == *.csv.zst ]]; then
+    zstd --rsyncable -19 -T$nj > "$fname.tmp"
+  elif [[ "$fname" == *.csv ]]; then
+    cat > "$fname.tmp"
   fi
 }
 
 MORDIO::TYPE::csv::finalize() {
-  local __fname="$1"
-  mv -vf "$__fname.tmp" "$__fname"
+  local fname="$1"
+  mv -vf "$fname.tmp" "$fname"
 }
 
 MORDIO::TYPE::csv::cleanup() {
-  local __fname="$1"
-  rm -vf "$__fname.tmp"
+  local fname="$1"
+  rm -vf "$fname.tmp"
 }
 
 # Metadata
 
 MORDIO::TYPE::csv::computeMeta() {
-  local __fname="$1"
-  MORDIO::TYPE::csv::load "$__fname" \
+  local fname="$1"
+  MORDIO::TYPE::csv::load "$fname" \
     | python3 -c "import csv; import sys; r = list(csv.reader(sys.stdin)); print(f'nRow={len(r)}\nnCol={len(r[0] if len(r)>0 else [])}')"
 }
 
 MORDIO::TYPE::csv::saveMeta() {
-  local __fname="$1"
-  if [[ "$__fname" == */* ]]; then
-    mkdir -pv "${__fname%/*}"
+  local fname="$1"
+  if [[ "$fname" == */* ]]; then
+    mkdir -pv "${fname%/*}"
   fi
-  cat > "$__fname.meta"
+  cat > "$fname.meta"
 }
 
 MORDIO::TYPE::csv::getNR() {
-  local __fname="$1"
-  gawk -F= '/^nRow=/ {print $2} /^---$/ {exit}' "$__fname.meta"
+  local fname="$1"
+  gawk -F= '/^nRow=/ {print $2} /^---$/ {exit}' "$fname.meta"
 }
 
 MORDIO::TYPE::csv::getNC() {
-  local __fname="$1"
-  gawk -F= '/^nCol=/ {print $2} /^---$/ {exit}' "$__fname.meta"
+  local fname="$1"
+  gawk -F= '/^nCol=/ {print $2} /^---$/ {exit}' "$fname.meta"
 }

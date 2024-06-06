@@ -18,63 +18,63 @@
 mordioTypeInit[table]=MORDIO::TYPE::table::INIT
 
 MORDIO::TYPE::table::INIT() {
-  local __nameVar="$1"
-  local __inout="$2"
+  local nameVar="$1"
+  local inout="$2"
 
-  populateType "$__nameVar" MORDIO::TYPE::table
+  populateType "$nameVar" MORDIO::TYPE::table
 }
 
 MORDIO::TYPE::table::checkName() {
-  local __fname="$1"
-  if [[ "$__fname" == *.zst ]]; then
+  local fname="$1"
+  if [[ "$fname" == *.zst ]]; then
     true
   else
-    err "Input argument $__fname has invalid extension" 36
+    err "Input argument $fname has invalid extension" 36
   fi
 }
 
 MORDIO::TYPE::table::checkValid() {
-  local __fname="$1"
-  if [[ ! -r "$__fname" ]]; then
-    err "Input argument $__fname does not exist" 36
+  local fname="$1"
+  if [[ ! -r "$fname" ]]; then
+    err "Input argument $fname does not exist" 36
   fi
-  if [[ ! -r "$__fname.meta" ]]; then
-    err "Input argument $__fname has no metadata" 36
+  if [[ ! -r "$fname.meta" ]]; then
+    err "Input argument $fname has no metadata" 36
   fi
 }
 
 MORDIO::TYPE::table::load() {
-  local __fname="$1"
-  if [[ "$__fname" == *.zst ]]; then
-    zstd -dc "$__fname"
+  local fname="$1"
+  if [[ "$fname" == *.zst ]]; then
+    zstd -dc "$fname"
   fi
 }
 
 MORDIO::TYPE::table::save() {
-  local __fname="$1"
-  if [[ "$__fname" == */* ]]; then
-    mkdir -pv "${__fname%/*}"
+  local fname="$1"
+  if [[ "$fname" == */* ]]; then
+    mkdir -pv "${fname%/*}"
   fi
-  if [[ "$__fname" == *.zst ]]; then
-    zstd --rsyncable -11 -T$nj > "$__fname.tmp"
+  if [[ "$fname" == *.zst ]]; then
+    zstd --rsyncable -11 -T$nj > "$fname.tmp"
   fi
 }
 
 MORDIO::TYPE::table::finalize() {
-  local __fname="$1"
-  mv -vf "$__fname.tmp" "$__fname"
+  local fname="$1"
+  mv -vf "$fname.tmp" "$fname"
 }
 
 MORDIO::TYPE::table::cleanup() {
-  local __fname="$1"
-  rm -vf "$__fname.tmp"
+  local fname="$1"
+  rm -vf "$fname.tmp"
 }
 
 # Metadata
 
 MORDIO::TYPE::table::computeMeta() {
-  local __fname="$1"
-  MORDIO::TYPE::table::load "$__fname" \
+  local fname="$1"
+  MORDIO::TYPE::table::load "$fname" \
     | LC_ALL=en_US.UTF-8 gawk -F$'\t' '
         END {
           print "nRecord=" NR;
@@ -83,19 +83,19 @@ MORDIO::TYPE::table::computeMeta() {
 }
 
 MORDIO::TYPE::table::saveMeta() {
-  local __fname="$1"
-  if [[ "$__fname" == */* ]]; then
-    mkdir -pv "${__fname%/*}"
+  local fname="$1"
+  if [[ "$fname" == */* ]]; then
+    mkdir -pv "${fname%/*}"
   fi
-  cat > "$__fname.meta"
+  cat > "$fname.meta"
 }
 
 MORDIO::TYPE::table::getNR() {
-  local __fname="$1"
-  gawk -F= '/^nRecord=/ {print $2} /^---$/ {exit}' "$__fname.meta"
+  local fname="$1"
+  gawk -F= '/^nRecord=/ {print $2} /^---$/ {exit}' "$fname.meta"
 }
 
 MORDIO::TYPE::table::getNF() {
-  local __fname="$1"
-  gawk -F= '/^nField=/ {print $2} /^---$/ {exit}' "$__fname.meta"
+  local fname="$1"
+  gawk -F= '/^nField=/ {print $2} /^---$/ {exit}' "$fname.meta"
 }

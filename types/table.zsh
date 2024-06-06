@@ -24,9 +24,13 @@ MORDIO::TYPE::table::INIT() {
   populateType "$nameVar" MORDIO::TYPE::table
 }
 
+# === Mordio Things ===
+
 MORDIO::TYPE::table::checkName() {
   local fname="$1"
-  if [[ "$fname" == *.zst ]]; then
+  if [[ "$fname" == *.zsh ]]; then
+    true
+  elif [[ "$fname" == *.zst ]]; then
     true
   else
     err "Input argument $fname has invalid extension" 36
@@ -38,25 +42,11 @@ MORDIO::TYPE::table::checkValid() {
   if [[ ! -r "$fname" ]]; then
     err "Input argument $fname does not exist" 36
   fi
+  if [[ "$fname" == *.zsh && ! -x "$fname" ]]; then
+    err "Input argument $fname is a script but not executable" 36
+  fi
   if [[ ! -r "$fname.meta" ]]; then
     err "Input argument $fname has no metadata" 36
-  fi
-}
-
-MORDIO::TYPE::table::load() {
-  local fname="$1"
-  if [[ "$fname" == *.zst ]]; then
-    zstd -dc "$fname"
-  fi
-}
-
-MORDIO::TYPE::table::save() {
-  local fname="$1"
-  if [[ "$fname" == */* ]]; then
-    mkdir -pv "${fname%/*}"
-  fi
-  if [[ "$fname" == *.zst ]]; then
-    zstd --rsyncable -11 -T$nj > "$fname.tmp"
   fi
 }
 
@@ -69,8 +59,6 @@ MORDIO::TYPE::table::cleanup() {
   local fname="$1"
   rm -vf "$fname.tmp"
 }
-
-# Metadata
 
 MORDIO::TYPE::table::computeMeta() {
   local fname="$1"
@@ -90,12 +78,64 @@ MORDIO::TYPE::table::saveMeta() {
   cat > "$fname.meta"
 }
 
+# === Save/Load ===
+
+MORDIO::TYPE::table::isReal() {
+  local fname="$1"
+  if [[ "$fname" == *.zsh ]]; then
+    false
+  else
+    true
+  fi
+}
+
+MORDIO::TYPE::table::getLoader() {
+  local fname="$1"
+  if [[ "$fname" == *.zsh ]]; then
+    printf '"./%s"' "$fname"
+  elif [[ "$fname" == *.zst ]]; then
+    printf 'zstd -dc "%s"' "$fname"
+  fi
+}
+
+MORDIO::TYPE::table::load() {
+  local fname="$1"
+  if [[ "$fname" == *.zsh ]]; then
+    "./$fname"
+  elif [[ "$fname" == *.zst ]]; then
+    zstd -dc "$fname"
+  fi
+}
+
+MORDIO::TYPE::table::save() {
+  local fname="$1"
+  if [[ "$fname" == */* ]]; then
+    mkdir -pv "${fname%/*}"
+  fi
+  if [[ "$fname" == *.zsh ]]; then
+    echo "#!/usr/bin/env zsh" > "$fname.tmp"
+    cat >> "$fname.tmp"
+    chmod 755 "$fname.tmp"
+  else
+    zstd --rsyncable -19 -T$nj > "$fname.tmp"
+  fi
+}
+
+# === Metadata Processing ===
+
+MORDIO::TYPE::table::dumpMeta() {
+  local fname="$1"
+  cat "$fname.meta"
+}
+
 MORDIO::TYPE::table::getNR() {
   local fname="$1"
-  gawk -F= '/^nRecord=/ {print $2} /^---$/ {exit}' "$fname.meta"
+  MORDIO::TYPE::table::dumpMeta "$1" \
+  | gawk -F= '/^nRecord=/ {print $2} /^---$/ {exit}'
 }
 
 MORDIO::TYPE::table::getNF() {
   local fname="$1"
-  gawk -F= '/^nField=/ {print $2} /^---$/ {exit}' "$fname.meta"
+  MORDIO::TYPE::table::dumpMeta "$1" \
+  | gawk -F= '/^nField=/ {print $2} /^---$/ {exit}'
 }

@@ -24,9 +24,13 @@ MORDIO::TYPE::text::INIT() {
   populateType "$nameVar" MORDIO::TYPE::text
 }
 
+# === Mordio Things ===
+
 MORDIO::TYPE::text::checkName() {
   local fname="$1"
-  if [[ "$fname" == *.txt.zst ]]; then
+  if [[ "$fname" == *.zsh ]]; then
+    true
+  elif [[ "$fname" == *.txt.zst ]]; then
     true
   else
     err "Input argument $fname has invalid extension" 36
@@ -37,23 +41,6 @@ MORDIO::TYPE::text::checkValid() {
   MORDIO::TYPE::table::checkValid "$@"
 }
 
-MORDIO::TYPE::text::load() {
-  local fname="$1"
-  if [[ "$fname" == *.txt.zst ]]; then
-    zstd -dc "$fname"
-  fi
-}
-
-MORDIO::TYPE::text::save() {
-  local fname="$1"
-  if [[ "$fname" == */* ]]; then
-    mkdir -pv "${fname%/*}"
-  fi
-  if [[ "$fname" == *.txt.zst ]]; then
-    zstd --rsyncable -11 -T$nj > "$fname.tmp"
-  fi
-}
-
 MORDIO::TYPE::text::finalize() {
   MORDIO::TYPE::table::finalize "$@"
 }
@@ -61,8 +48,6 @@ MORDIO::TYPE::text::finalize() {
 MORDIO::TYPE::text::cleanup() {
   MORDIO::TYPE::table::cleanup "$@"
 }
-
-# Metadata
 
 MORDIO::TYPE::text::computeMeta() {
   local fname="$1"
@@ -74,14 +59,34 @@ MORDIO::TYPE::text::computeMeta() {
 }
 
 MORDIO::TYPE::text::saveMeta() {
-  local fname="$1"
-  if [[ "$fname" == */* ]]; then
-    mkdir -pv "${fname%/*}"
-  fi
-  cat > "$fname.meta"
+  MORDIO::TYPE::table::saveMeta "$@"
+}
+
+# === Save/Load ===
+
+MORDIO::TYPE::text::isReal() {
+  MORDIO::TYPE::table::isReal "$@"
+}
+
+MORDIO::TYPE::text::getLoader() {
+  MORDIO::TYPE::table::getLoader "$@"
+}
+
+MORDIO::TYPE::text::load() {
+  MORDIO::TYPE::table::load "$@"
+}
+
+MORDIO::TYPE::text::save() {
+  MORDIO::TYPE::table::save "$@"
+}
+
+# === Metadata Processing ===
+
+MORDIO::TYPE::text::dumpMeta() {
+  MORDIO::TYPE::table::dumbMeta "$@"
 }
 
 MORDIO::TYPE::text::getNR() {
-  local fname="$1"
-  gawk -F= '/^nRecord=/ {print $2} /^---$/ {exit}' "$fname.meta"
+  MORDIO::TYPE::table::getNR "$@"
 }
+

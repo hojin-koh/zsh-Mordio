@@ -78,6 +78,16 @@ MORDIO::TYPE::table::saveMeta() {
   cat > "$fname.meta"
 }
 
+MORDIO::TYPE::table::dumpMeta() {
+  local fname="$1"
+  cat "$fname.meta"
+}
+
+MORDIO::TYPE::table::getMainFile() {
+  local fname="$1"
+  echo "$fname"
+}
+
 # === Save/Load ===
 
 MORDIO::TYPE::table::isReal() {
@@ -122,11 +132,6 @@ MORDIO::TYPE::table::save() {
 }
 
 # === Metadata Processing ===
-
-MORDIO::TYPE::table::dumpMeta() {
-  local fname="$1"
-  cat "$fname.meta"
-}
 
 MORDIO::TYPE::table::getNR() {
   local fname="$1"

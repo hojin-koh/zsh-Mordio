@@ -22,6 +22,7 @@ fi
 skrittLibraryInit() {
   source "$MORDIO_ROOT_DIR/lib/logging.zsh"
   source "$MORDIO_ROOT_DIR/lib/type.zsh"
+  source "$MORDIO_ROOT_DIR/lib/check.zsh"
   source "$MORDIO_ROOT_DIR/lib/parallel.zsh"
 
   opt -Mordio nj "${OMP_NUM_THREADS-3}" "Number of parallel processes on this machine"

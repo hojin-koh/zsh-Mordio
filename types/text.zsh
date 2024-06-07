@@ -62,6 +62,14 @@ MORDIO::TYPE::text::saveMeta() {
   MORDIO::TYPE::table::saveMeta "$@"
 }
 
+MORDIO::TYPE::text::dumpMeta() {
+  MORDIO::TYPE::table::dumpMeta "$@"
+}
+
+MORDIO::TYPE::text::getMainFile() {
+  MORDIO::TYPE::table::getMainFile "$@"
+}
+
 # === Save/Load ===
 
 MORDIO::TYPE::text::isReal() {
@@ -81,10 +89,6 @@ MORDIO::TYPE::text::save() {
 }
 
 # === Metadata Processing ===
-
-MORDIO::TYPE::text::dumpMeta() {
-  MORDIO::TYPE::table::dumbMeta "$@"
-}
 
 MORDIO::TYPE::text::getNR() {
   MORDIO::TYPE::table::getNR "$@"

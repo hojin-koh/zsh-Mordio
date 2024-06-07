@@ -66,16 +66,15 @@ populateType() {
 
 MORDIO::FLOW::checkArgs() {
   local arg
-  local i
   for arg in "${(k)mordioMapOptType[@]}"; do
-    ${arg}::ALL::checkName $i
+    ${arg}::ALL::checkName
 
     if [[ "${mordioMapOptDirection[$arg]}" == "input" ]]; then
-      ${arg}::ALL::checkValid $i
+      ${arg}::ALL::checkValid
     fi
   done
 }
-addHook postparse MORDIO::FLOW::checkArgs
+addHook prerun MORDIO::FLOW::checkArgs
 
 MORDIO::FLOW::writeMeta() {
   local __arg
@@ -87,9 +86,11 @@ MORDIO::FLOW::writeMeta() {
     for (( __i=1; __i<=${#${(A)${(P)__arg}}[@]}; __i++ )); do
       (
         ${__arg}::computeMeta $__i
+        printf '_scriptsum='
+        getScriptSum || true
         printf '\n---\n\n'
         date +'%Y-%m-%d %H:%M:%S'
-        printf '@ %s\n\n' "${HOST-${HOSTNAME-}}"
+        printf '%s @ %s\n\n' "${ZSH_ARGZERO:t}" "${HOST-${HOSTNAME-}}"
         local grp
         local var
         for grp in "" "${skrittOptGroups[@]}" "Skritt"; do

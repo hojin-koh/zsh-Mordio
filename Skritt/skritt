@@ -19,6 +19,9 @@ set -o err_return
 set -o no_unset
 set -o pipefail
 
+# Setup our own SHLVL
+export SKRITT_SHLVL=$[${SKRITT_SHLVL-0}+1]
+
 # Open file descriptor 5 (show only, no logging) if not yet done
 if [[ ! -e /dev/fd/5 ]]; then
   exec 5>&2
@@ -72,6 +75,7 @@ else
     main "$@"
     SKRITT::FLOW::postrun "$@"
   else
-    info "Check passed, no need to run $skrittCommandLineOriginal"
+    unset -f TRAPEXIT
+    debug "Check passed, no need to run $skrittCommandLineOriginal"
   fi
 fi

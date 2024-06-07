@@ -22,8 +22,13 @@ SKRITT::INTERNAL::outputMessage() {
   local msg="$3"
   local charEnd="${4-\n}"
   local elapsed="$SECONDS"
-  printf "\033[%sm[%s-%08.1f] %s\033[m\033[K$charEnd" "$codeColor" "$typeMsg" "$elapsed" "$msg" >&5
-  printf "[%s-%08.1f] %s$charEnd" "$typeMsg" "$elapsed" "$msg" >&6
+  printf "\033[%sm[%08.1f] " "$codeColor" "$elapsed" >&5
+  printf "[%08.1f] " "$elapsed" >&6
+
+  printf "$typeMsg%.0s" {1..$SKRITT_SHLVL}
+
+  printf " %s\033[m\033[K$charEnd" "$msg" >&5
+  printf " %s$charEnd" "$msg" >&6
 }
 
 debug() {
@@ -33,12 +38,11 @@ debug() {
   printf "[D-%06.1f] %s\n" "$SECONDS" "$1" >&6
 }
 
-titleinfo() {
-  if [[ "$1" == ">"* ]]; then
-    SKRITT::INTERNAL::outputMessage T '1;35' "$1"
-  else
-    SKRITT::INTERNAL::outputMessage T '1;32' "$1"
-  fi
+titleinfoBegin() {
+  SKRITT::INTERNAL::outputMessage '>' '1;35' "$1"
+}
+titleinfoEnd() {
+  SKRITT::INTERNAL::outputMessage '<' '1;32' "$1"
 }
 
 info() {

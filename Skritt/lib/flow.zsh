@@ -63,9 +63,9 @@ SKRITT::FLOW::prerun() {
   fi
 
   if [[ -n "${skrittCommandLineOriginal-}" ]]; then
-    titleinfo "> ($SKRITT_BEGIN_DATE) Begin $$ $skrittCommandLineOriginal"
+    titleinfoBegin "($SKRITT_BEGIN_DATE) Begin $$ $skrittCommandLineOriginal"
   else
-    titleinfo "> ($SKRITT_BEGIN_DATE) Begin $$ $ZSH_ARGZERO $@"
+    titleinfoBegin "($SKRITT_BEGIN_DATE) Begin $$ $ZSH_ARGZERO $@"
   fi
   debug "@ ${HOST-${HOSTNAME-}}"
   invokeHook prerun "$@"
@@ -81,9 +81,9 @@ TRAPEXIT() {
   local rtn=$?
   invokeHook exit "$rtn"
   if [[ "$rtn" == 0 ]]; then
-    titleinfo "< ($(showReadableTime $SECONDS)) End $$ $ZSH_ARGZERO"
+    titleinfoEnd "($(showReadableTime $SECONDS)) End $$ $ZSH_ARGZERO"
   else
-    err "< ($(showReadableTime $SECONDS)) End with error ($rtn) $ZSH_ARGZERO"
+    err "($(showReadableTime $SECONDS)) End with error ($rtn) $ZSH_ARGZERO"
   fi
   echo >&5 # a new line after ending
 }

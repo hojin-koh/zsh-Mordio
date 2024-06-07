@@ -62,9 +62,7 @@ MORDIO::FLOW::check() {
   local arg2
   for arg2 in "${aVarOut[@]}"; do
     for arg1 in "${aVarIn[@]}"; do
-      info "CHECK $arg1 $arg2"
       if ! isAllOlder "$arg1" "$arg2"; then
-        warn "CHECK $arg1 $arg2"
         return 1
       fi
     done

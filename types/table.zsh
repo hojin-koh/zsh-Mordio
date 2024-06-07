@@ -14,6 +14,7 @@
 
 # Type definition: table
 # Table is a series of id/contents rows, separated by tabs
+# ids are supposed to be unique
 
 mordioTypeInit[table]=MORDIO::TYPE::table::INIT
 

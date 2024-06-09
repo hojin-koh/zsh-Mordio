@@ -128,7 +128,7 @@ MORDIO::TYPE::table::save() {
     cat >> "$fname.tmp"
     chmod 755 "$fname.tmp"
   else
-    zstd --rsyncable -19 -T$nj > "$fname.tmp"
+    zstd --rsyncable -13 -T$nj > "$fname.tmp"
   fi
 }
 

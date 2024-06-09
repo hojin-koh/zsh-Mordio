@@ -45,7 +45,11 @@ doParallelPipeText() {
   local i
   for i in $(seq -f '%03.0f' 0 $[nj-1]); do
     local INPUT="$dirTempPipe/_pipes/_input.$i"
-    ( eval "$func" | tee "$dirTempPipe/_pipes/_output.$i" >&${fdPV} ) & pids+=( $! )
+    if [[ "$func" == *INPUT* ]]; then
+      ( eval "$func" | tee "$dirTempPipe/_pipes/_output.$i" >&${fdPV} ) & pids+=( $! )
+    else
+      ( cat "$INPUT" | eval "$func" | tee "$dirTempPipe/_pipes/_output.$i" >&${fdPV} ) & pids+=( $! )
+    fi
   done
   info "Spawned subprocesses ($nj) ${pids[*]}"
   exec {fdPV}<&-

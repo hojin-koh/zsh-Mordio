@@ -21,20 +21,26 @@ import os
 import selectors
 import sys
 
+idxKey = 0
+nKey = 0
 aKeys = []
 aPipes = []
 mBuffer = {}
 mLineBuffer = {}
 
 def readKeys(fname):
+    global nKey
     with open(fname, 'rb') as fp:
         for key in fp:
             if b'\t' in key:
                 key = key.split(b'\t', 1)[0]
             if len(key) > 0:
                 aKeys.append(key.strip())
+    nKey = len(aKeys)
 
 def processPipeData(objSel, fp):
+    global nKey
+    global idxKey
     line = fp.readline()
 
     if line:
@@ -54,21 +60,19 @@ def processPipeData(objSel, fp):
             key = line
             val = ''
         key = key.strip()
-        if key != aKeys[0]:
+        if key != aKeys[idxKey]:
             mBuffer[key] = line
         else:
-            aKeys.pop(0)
+            idxKey += 1
             sys.stdout.buffer.write(line)
-            sys.stdout.flush()
         # See if any other blocked outputs can now be printed
-        while len(aKeys)>0 and len(mBuffer)>0:
-            if aKeys[0] not in mBuffer:
+        while idxKey < nKey and len(mBuffer)>0:
+            if aKeys[idxKey] not in mBuffer:
                 break
-            key = aKeys[0]
-            aKeys.pop(0)
+            key = aKeys[idxKey]
+            idxKey += 1
             line = mBuffer[key]
             sys.stdout.buffer.write(line)
-            sys.stdout.flush()
             del mBuffer[key]
 
     else:

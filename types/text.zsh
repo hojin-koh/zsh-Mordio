@@ -85,6 +85,22 @@ MORDIO::TYPE::text::load() {
   MORDIO::TYPE::table::load "$@"
 }
 
+MORDIO::TYPE::text::getLoaderKey() {
+  MORDIO::TYPE::table::getLoaderKey "$@"
+}
+
+MORDIO::TYPE::text::loadKey() {
+  MORDIO::TYPE::table::loadKey "$@"
+}
+
+MORDIO::TYPE::text::getLoaderValue() {
+  MORDIO::TYPE::table::getLoaderValue "$@"
+}
+
+MORDIO::TYPE::text::loadValue() {
+  MORDIO::TYPE::table::loadValue "$@"
+}
+
 MORDIO::TYPE::text::save() {
   MORDIO::TYPE::table::save "$@"
 }

@@ -108,6 +108,26 @@ MORDIO::TYPE::table::load() {
   fi
 }
 
+MORDIO::TYPE::table::getLoaderKey() {
+  MORDIO::TYPE::table::getLoader "$@"
+  printf ' | %s' "cut -d\$'\\t' -f1"
+}
+
+MORDIO::TYPE::table::loadKey() {
+  MORDIO::TYPE::table::load "$@" \
+  | cut -d$'\t' -f1
+}
+
+MORDIO::TYPE::table::getLoaderValue() {
+  MORDIO::TYPE::table::getLoader "$@"
+  printf ' | %s' "cut -d\$'\\t' -f2-"
+}
+
+MORDIO::TYPE::table::loadValue() {
+  MORDIO::TYPE::table::load "$@" \
+  | cut -d$'\t' -f2-
+}
+
 MORDIO::TYPE::table::save() {
   local fname="$1"
   if ! MORDIO::TYPE::file::save "$@"; then

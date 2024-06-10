@@ -61,25 +61,14 @@ MORDIO::FLOW::check() {
   local arg1
   local arg2
   for arg2 in "${aVarOut[@]}"; do
-    ${arg2}::ALL::checkValid info
+    ${arg2}::ALL::checkValid debug
     for arg1 in "${aVarIn[@]}"; do
       if ! isAllOlder "$arg1" "$arg2"; then
+        warn "$arg1 not older than $arg2, rerun needed"
         return 1
       fi
     done
-  done
-
-  # Check script checksum
-  local metalines
-  local sumActual="$(getScriptSum)"
-  local sumRecorded
-  for arg2 in "${aVarOut[@]}"; do
-    metalines="$(${arg2}::ALL::dumpMeta 2>/dev/null | gawk -F= '/^_scriptsum=/ {print $2}')"
-    for sumRecorded in "${(f)metalines}"; do
-      if [[ "$sumRecorded" != "$sumActual" ]]; then
-        return 1
-      fi
-    done
+    ${arg2}::ALL::checkScriptSum
   done
 
   return 0

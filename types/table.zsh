@@ -29,41 +29,27 @@ MORDIO::TYPE::table::INIT() {
 
 MORDIO::TYPE::table::checkName() {
   local fname="$1"
-  if [[ "$fname" == *.zsh ]]; then
-    true
-  elif [[ "$fname" == *.zst ]]; then
-    true
-  else
-    warn "Input argument $fname has invalid extension"
-    return 36
+  if ! MORDIO::TYPE::file::checkName "$@"; then
+    if [[ "$fname" == *.zst ]]; then
+      return 0
+    else
+      err "Input argument $fname has invalid extension"
+      return 36
+    fi
   fi
+  return 0
 }
 
 MORDIO::TYPE::table::checkValid() {
-  local fname="$1"
-  local warnerr="$2"
-  if [[ ! -r "$fname" ]]; then
-    "$warnerr" "Argument $fname does not exist"
-    return 36
-  fi
-  if [[ "$fname" == *.zsh && ! -x "$fname" ]]; then
-    "$warnerr" "Argument $fname is a script but not executable"
-    return 36
-  fi
-  if [[ ! -r "$fname.meta" ]]; then
-    "$warnerr" "Argument $fname has no metadata"
-    return 36
-  fi
+  MORDIO::TYPE::file::checkValid "$@"
 }
 
 MORDIO::TYPE::table::finalize() {
-  local fname="$1"
-  mv -vf "$fname.tmp" "$fname"
+  MORDIO::TYPE::file::finalize "$@"
 }
 
 MORDIO::TYPE::table::cleanup() {
-  local fname="$1"
-  rm -vf "$fname.tmp"
+  MORDIO::TYPE::file::cleanup "$@"
 }
 
 MORDIO::TYPE::table::computeMeta() {
@@ -72,68 +58,65 @@ MORDIO::TYPE::table::computeMeta() {
     | LC_ALL=en_US.UTF-8 gawk -F$'\t' '
         END {
           print "nRecord=" NR;
-          print "nField=" NF;
         }'
+  MORDIO::TYPE::file::computeMeta "$@"
 }
 
 MORDIO::TYPE::table::saveMeta() {
-  local fname="$1"
-  if [[ "$fname" == */* ]]; then
-    mkdir -pv "${fname%/*}"
-  fi
-  cat > "$fname.meta"
+  MORDIO::TYPE::file::saveMeta "$@"
 }
 
 MORDIO::TYPE::table::dumpMeta() {
-  local fname="$1"
-  cat "$fname.meta"
+  MORDIO::TYPE::file::dumpMeta "$@"
+}
+
+MORDIO::TYPE::table::checkScriptSum() {
+  MORDIO::TYPE::file::checkScriptSum "$@"
 }
 
 MORDIO::TYPE::table::getMainFile() {
-  local fname="$1"
-  echo "$fname"
+  MORDIO::TYPE::file::getMainFile "$@"
 }
 
 # === Save/Load ===
 
 MORDIO::TYPE::table::isReal() {
-  local fname="$1"
-  if [[ "$fname" == *.zsh ]]; then
-    false
-  else
-    true
-  fi
+  MORDIO::TYPE::file::isReal "$@"
 }
 
 MORDIO::TYPE::table::getLoader() {
   local fname="$1"
-  if [[ "$fname" == *.zsh ]]; then
-    printf '"./%s"' "$fname"
-  elif [[ "$fname" == *.zst ]]; then
-    printf 'zstd -dc "%s"' "$fname"
+  if ! MORDIO::TYPE::file::getLoader "$@"; then
+    if [[ "$fname" == *.zst ]]; then
+      printf 'zstd -dc "%s"' "$fname"
+      return 0
+    else
+      return 1
+    fi
   fi
 }
 
 MORDIO::TYPE::table::load() {
   local fname="$1"
-  if [[ "$fname" == *.zsh ]]; then
-    "./$fname"
-  elif [[ "$fname" == *.zst ]]; then
-    zstd -dc "$fname"
+  if ! MORDIO::TYPE::file::load "$@"; then
+    if [[ "$fname" == *.zst ]]; then
+      zstd -dc "$fname"
+      return 0
+    else
+      return 1
+    fi
   fi
 }
 
 MORDIO::TYPE::table::save() {
   local fname="$1"
-  if [[ "$fname" == */* ]]; then
-    mkdir -pv "${fname%/*}"
-  fi
-  if [[ "$fname" == *.zsh ]]; then
-    echo "#!/usr/bin/env zsh" > "$fname.tmp"
-    cat >> "$fname.tmp"
-    chmod 755 "$fname.tmp"
-  else
-    zstd --rsyncable -13 -T$nj > "$fname.tmp"
+  if ! MORDIO::TYPE::file::save "$@"; then
+    if [[ "$fname" == *.zst ]]; then
+      zstd --rsyncable -13 -T$nj > "$fname.tmp"
+      return 0
+    else
+      return 1
+    fi
   fi
 }
 
@@ -143,10 +126,4 @@ MORDIO::TYPE::table::getNR() {
   local fname="$1"
   MORDIO::TYPE::table::dumpMeta "$1" \
   | gawk -F= '/^nRecord=/ {print $2} /^---$/ {exit}'
-}
-
-MORDIO::TYPE::table::getNF() {
-  local fname="$1"
-  MORDIO::TYPE::table::dumpMeta "$1" \
-  | gawk -F= '/^nField=/ {print $2} /^---$/ {exit}'
 }

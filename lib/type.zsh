@@ -92,8 +92,6 @@ MORDIO::FLOW::writeMeta() {
     for (( __i=1; __i<=${#${(A)${(P)__arg}}[@]}; __i++ )); do
       (
         ${__arg}::computeMeta $__i
-        printf '_scriptsum='
-        getScriptSum || true
         printf '\n---\n\n'
         date +'%Y-%m-%d %H:%M:%S'
         printf '%s @ %s\n\n' "${ZSH_ARGZERO:t}" "${HOST-${HOSTNAME-}}"

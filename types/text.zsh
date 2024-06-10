@@ -28,52 +28,53 @@ MORDIO::TYPE::text::INIT() {
 
 MORDIO::TYPE::text::checkName() {
   local fname="$1"
-  if [[ "$fname" == *.zsh ]]; then
-    true
-  elif [[ "$fname" == *.txt.zst ]]; then
-    true
-  else
-    err "Input argument $fname has invalid extension" 36
+  if ! MORDIO::TYPE::file::checkName "$@"; then
+    if [[ "$fname" == *.txt.zst ]]; then
+      return 0
+    else
+      err "Input argument $fname has invalid extension"
+      return 36
+    fi
   fi
+  return 0
 }
 
 MORDIO::TYPE::text::checkValid() {
-  MORDIO::TYPE::table::checkValid "$@"
+  MORDIO::TYPE::file::checkValid "$@"
 }
 
 MORDIO::TYPE::text::finalize() {
-  MORDIO::TYPE::table::finalize "$@"
+  MORDIO::TYPE::file::finalize "$@"
 }
 
 MORDIO::TYPE::text::cleanup() {
-  MORDIO::TYPE::table::cleanup "$@"
+  MORDIO::TYPE::file::cleanup "$@"
 }
 
 MORDIO::TYPE::text::computeMeta() {
-  local fname="$1"
-  MORDIO::TYPE::text::load "$fname" \
-    | LC_ALL=en_US.UTF-8 gawk -F$'\t' '
-        END {
-          print "nRecord=" NR;
-        }'
+  MORDIO::TYPE::table::computeMeta "$@"
 }
 
 MORDIO::TYPE::text::saveMeta() {
-  MORDIO::TYPE::table::saveMeta "$@"
+  MORDIO::TYPE::file::saveMeta "$@"
 }
 
 MORDIO::TYPE::text::dumpMeta() {
-  MORDIO::TYPE::table::dumpMeta "$@"
+  MORDIO::TYPE::file::dumpMeta "$@"
+}
+
+MORDIO::TYPE::text::checkScriptSum() {
+  MORDIO::TYPE::file::checkScriptSum "$@"
 }
 
 MORDIO::TYPE::text::getMainFile() {
-  MORDIO::TYPE::table::getMainFile "$@"
+  MORDIO::TYPE::file::getMainFile "$@"
 }
 
 # === Save/Load ===
 
 MORDIO::TYPE::text::isReal() {
-  MORDIO::TYPE::table::isReal "$@"
+  MORDIO::TYPE::file::isReal "$@"
 }
 
 MORDIO::TYPE::text::getLoader() {

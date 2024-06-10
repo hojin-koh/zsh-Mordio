@@ -49,7 +49,7 @@ populateType() {
     local __stem="${__func##*::}"
     if [[ "$__stem" == INIT ]]; then continue; fi
     if [[ "${(Pt)__nameVar}" == "array" ]]; then
-      eval "${__nameVar}::${__stem}() { local __i=\"\$1\"; ${__namespace}::${__stem} \"\${${__nameVar}[\$__i]}\" \"\$@\" }"
+      eval "${__nameVar}::${__stem}() { local __i=\"\$1\"; shift; ${__namespace}::${__stem} \"\${${__nameVar}[\$__i]}\" \"\$@\" }"
       eval "${__nameVar}::ALL::${__stem}() { local __i; for (( __i=1; __i<=\${#${__nameVar}[@]}; __i++ )); do ${__nameVar}::${__stem} \"\$__i\" \"\$@\"; done }"
     elif [[ "${(Pt)__nameVar}" == "scalar" ]]; then 
       eval "${__nameVar}::${__stem}() { ${__namespace}::${__stem} \"\$$__nameVar\" \"\$@\" }"
@@ -64,17 +64,23 @@ populateType() {
   fi
 }
 
-MORDIO::FLOW::checkArgs() {
+MORDIO::FLOW::checkArgNames() {
   local arg
   for arg in "${(k)mordioMapOptType[@]}"; do
     ${arg}::ALL::checkName
+  done
+}
+addHook postparse MORDIO::FLOW::checkArgNames
 
+MORDIO::FLOW::checkInputArgs() {
+  local arg
+  for arg in "${(k)mordioMapOptType[@]}"; do
     if [[ "${mordioMapOptDirection[$arg]}" == "input" ]]; then
-      ${arg}::ALL::checkValid
+      ${arg}::ALL::checkValid err
     fi
   done
 }
-addHook prerun MORDIO::FLOW::checkArgs
+addHook prerun MORDIO::FLOW::checkInputArgs
 
 MORDIO::FLOW::writeMeta() {
   local __arg

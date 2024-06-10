@@ -34,20 +34,25 @@ MORDIO::TYPE::table::checkName() {
   elif [[ "$fname" == *.zst ]]; then
     true
   else
-    err "Input argument $fname has invalid extension" 36
+    warn "Input argument $fname has invalid extension"
+    return 36
   fi
 }
 
 MORDIO::TYPE::table::checkValid() {
   local fname="$1"
+  local warnerr="$2"
   if [[ ! -r "$fname" ]]; then
-    err "Input argument $fname does not exist" 36
+    "$warnerr" "Argument $fname does not exist"
+    return 36
   fi
   if [[ "$fname" == *.zsh && ! -x "$fname" ]]; then
-    err "Input argument $fname is a script but not executable" 36
+    "$warnerr" "Argument $fname is a script but not executable"
+    return 36
   fi
   if [[ ! -r "$fname.meta" ]]; then
-    err "Input argument $fname has no metadata" 36
+    "$warnerr" "Argument $fname has no metadata"
+    return 36
   fi
 }
 

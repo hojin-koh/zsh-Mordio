@@ -19,6 +19,9 @@ declare -ga skrittTempDirs
 # Add temp dir
 putTemp() {
   local __var="$1"
+  if [[ -n "${TMPDIR-}" && ! -d "$TMPDIR" ]]; then
+    mkdir -pv "$TMPDIR"
+  fi
   typeset -g "$__var=$(mktemp -d)"
   info "Generated temp dir: ${(P)__var}"
   skrittTempDirs+=("${(P)__var}")

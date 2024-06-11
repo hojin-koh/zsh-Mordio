@@ -40,6 +40,8 @@ isAllOlder() {
   return 0
 }
 
+opt -Mordio bump '' "Bump the metadata of output files without actually re-run the script"
+
 # Check if all input data is older than all output data, and the script checksum didn't change
 # If no need to run, return 0, else return 1
 MORDIO::FLOW::check() {
@@ -62,6 +64,20 @@ MORDIO::FLOW::check() {
   local arg2
   for arg2 in "${aVarOut[@]}"; do
     ${arg2}::ALL::checkValid debug
+  done
+
+  # Now that all output exists, just bump the meta file and update the timestamp
+  # So that we don't need to re-run
+  if [[ $bump == true ]]; then
+    MORDIO::FLOW::writeMeta # Pretending we DID generated these output
+    for arg2 in "${aVarOut[@]}"; do
+      info "Bumping metadata for $arg2=${(P)arg2[*]}"
+      touch ${(z)$(${arg2}::ALL::getMainFile)} /dev/null # /dev/null ensure we always has at least 1 argument to touch
+    done
+    return 0
+  fi
+
+  for arg2 in "${aVarOut[@]}"; do
     for arg1 in "${aVarIn[@]}"; do
       if ! isAllOlder "$arg1" "$arg2"; then
         warn "$arg1 not older than $arg2, rerun needed"

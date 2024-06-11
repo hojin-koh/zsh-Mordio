@@ -65,8 +65,6 @@ MORDIO::TYPE::file::cleanup() {
 
 MORDIO::TYPE::file::computeMeta() {
   local fname="$1"
-  printf '_scriptsum='
-  getScriptSum || true
 }
 
 MORDIO::TYPE::file::saveMeta() {

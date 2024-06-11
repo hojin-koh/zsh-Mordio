@@ -82,16 +82,28 @@ MORDIO::FLOW::checkInputArgs() {
 }
 addHook prerun MORDIO::FLOW::checkInputArgs
 
+MORDIO::FLOW::finalizeOutput() {
+  local __arg
+  local __i
+  for __arg in "${(k)mordioMapOptType[@]}"; do
+    if [[ "${mordioMapOptDirection[$__arg]}" == "input" ]]; then continue; fi
+    ${__arg}::ALL::finalize $__i
+  done
+}
+addHook postrun MORDIO::FLOW::finalizeOutput
+
 MORDIO::FLOW::writeMeta() {
   local __arg
   local __i
   for __arg in "${(k)mordioMapOptType[@]}"; do
     if [[ "${mordioMapOptDirection[$__arg]}" == "input" ]]; then continue; fi
 
-    ${__arg}::ALL::finalize $__i
     for (( __i=1; __i<=${#${(A)${(P)__arg}}[@]}; __i++ )); do
       (
         ${__arg}::computeMeta $__i
+        printf '_scriptsum='
+        getScriptSum || true
+
         printf '\n---\n\n'
         date +'%Y-%m-%d %H:%M:%S'
         printf '%s @ %s\n\n' "${ZSH_ARGZERO:t}" "${HOST-${HOSTNAME-}}"

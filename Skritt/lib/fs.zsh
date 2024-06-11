@@ -30,7 +30,7 @@ putTemp() {
 SKRITT::HOOK::cleanUpTemp() {
   local pathTmp
   for pathTmp in "${(@)skrittTempDirs}"; do
-    if [[ "$pathTmp" != /tmp* ]]; then
+    if [[ "$pathTmp" != ${TMPDIR}* ]]; then
       continue
     fi
     rm -rf "$pathTmp"

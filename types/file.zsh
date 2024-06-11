@@ -15,13 +15,13 @@
 # Type definition: base
 # This is the base of file types, with no regard of what is inside
 
-mordioTypeInit[table]=MORDIO::TYPE::file::INIT
+mordioTypeInit[file]=MORDIO::TYPE::file::INIT
 
 MORDIO::TYPE::file::INIT() {
   local nameVar="$1"
   local inout="$2"
 
-  populateType "$nameVar" MORDIO::TYPE::table
+  populateType "$nameVar" MORDIO::TYPE::file
 }
 
 # === Mordio Things ===

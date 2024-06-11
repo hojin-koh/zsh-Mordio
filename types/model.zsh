@@ -34,6 +34,8 @@ MORDIO::TYPE::model::checkName() {
       return 0
     elif [[ "$fname" == *.gz ]]; then
       return 0
+    elif [[ "$fname" == *.bz2 ]]; then
+      return 0
     elif [[ "$fname" == *.model ]]; then
       return 0
     else
@@ -91,6 +93,9 @@ MORDIO::TYPE::model::getLoader() {
     elif [[ "$fname" == *.gz ]]; then
       printf 'gunzip -c "%s"' "$fname"
       return 0
+    elif [[ "$fname" == *.bz2 ]]; then
+      printf 'bunzip2 -c "%s"' "$fname"
+      return 0
     elif [[ "$fname" == *.model ]]; then
       printf 'cat "%s"' "$fname"
       return 0
@@ -109,8 +114,32 @@ MORDIO::TYPE::model::load() {
     elif [[ "$fname" == *.gz ]]; then
       gunzip -c "$fname"
       return 0
+    elif [[ "$fname" == *.bz2 ]]; then
+      bunzip2 -c "$fname"
+      return 0
     elif [[ "$fname" == *.model ]]; then
       cat "$fname"
+      return 0
+    else
+      return 1
+    fi
+  fi
+}
+
+MORDIO::TYPE::model::save() {
+  local fname="$1"
+  if ! MORDIO::TYPE::file::save "$@"; then
+    if [[ "$fname" == *.zst ]]; then
+      zstd --rsyncable --ultra -22 -T$nj > "$fname.tmp"
+      return 0
+    elif [[ "$fname" == *.gz ]]; then
+      gzip -9c > "$fname.tmp"
+      return 0
+    elif [[ "$fname" == *.bz2 ]]; then
+      bzip2 -9c > "$fname.tmp"
+      return 0
+    elif [[ "$fname" == *.model ]]; then
+      cat > "$fname.tmp"
       return 0
     else
       return 1

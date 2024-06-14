@@ -80,11 +80,14 @@ MORDIO::FLOW::check() {
   for arg2 in "${aVarOut[@]}"; do
     for arg1 in "${aVarIn[@]}"; do
       if ! isAllOlder "$arg1" "$arg2"; then
-        warn "$arg1 not older than $arg2, rerun needed"
+        warn "$arg1 not older than $arg2, will rerun"
         return 1
       fi
     done
-    ${arg2}::ALL::checkScriptSum
+    if ! ${arg2}::ALL::checkScriptSum; then
+      warn "Script changed for $arg2, will rerun"
+      return 1
+    fi
   done
 
   return 0

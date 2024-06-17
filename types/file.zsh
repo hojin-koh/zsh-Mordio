@@ -137,3 +137,12 @@ MORDIO::TYPE::file::save() {
     return 1
   fi
 }
+
+MORDIO::TYPE::file::saveCopy() {
+  local fname="$1"
+  local fnameSource="$2"
+  if [[ "$fname" == */* ]]; then
+    mkdir -pv "${fname%/*}"
+  fi
+  install -v "$fnameSource" $fname.tmp
+}

@@ -146,3 +146,7 @@ MORDIO::TYPE::model::save() {
     fi
   fi
 }
+
+MORDIO::TYPE::model::saveCopy() {
+  MORDIO::TYPE::file::saveCopy "$@"
+}

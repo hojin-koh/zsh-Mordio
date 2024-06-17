@@ -63,7 +63,9 @@ MORDIO::FLOW::check() {
   local arg1
   local arg2
   for arg2 in "${aVarOut[@]}"; do
-    ${arg2}::ALL::checkValid debug
+    if [[ -n ${(P)arg2} ]]; then
+      ${arg2}::ALL::checkValid debug
+    fi
   done
 
   # Now that all output exists, just bump the meta file and update the timestamp
@@ -79,9 +81,11 @@ MORDIO::FLOW::check() {
 
   for arg2 in "${aVarOut[@]}"; do
     for arg1 in "${aVarIn[@]}"; do
-      if ! isAllOlder "$arg1" "$arg2"; then
-        warn "$arg1 not older than $arg2, will rerun"
-        return 1
+      if [[ -n ${(P)arg1} && -n ${(P)arg2} ]]; then
+        if ! isAllOlder "$arg1" "$arg2"; then
+          warn "$arg1 not older than $arg2, will rerun"
+          return 1
+        fi
       fi
     done
     if ! ${arg2}::ALL::checkScriptSum; then

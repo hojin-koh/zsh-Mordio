@@ -67,7 +67,9 @@ populateType() {
 MORDIO::FLOW::checkArgNames() {
   local arg
   for arg in "${(k)mordioMapOptType[@]}"; do
-    ${arg}::ALL::checkName
+    if [[ -n ${(P)arg} ]]; then
+      ${arg}::ALL::checkName
+    fi
   done
 }
 addHook postparse MORDIO::FLOW::checkArgNames
@@ -76,7 +78,9 @@ MORDIO::FLOW::checkInputArgs() {
   local arg
   for arg in "${(k)mordioMapOptType[@]}"; do
     if [[ "${mordioMapOptDirection[$arg]}" == "input" ]]; then
-      ${arg}::ALL::checkValid err
+      if [[ -n ${(P)arg} ]]; then
+        ${arg}::ALL::checkValid err
+      fi
     fi
   done
 }

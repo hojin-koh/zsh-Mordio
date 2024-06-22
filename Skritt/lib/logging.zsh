@@ -19,16 +19,16 @@ opt -Skritt logfile '' "Log File"
 opt -Skritt logrotate 3 "Number of old log files to keep"
 
 setupLog() {
-  local fname="$1"
-  local nRotate="$2"
+  local fname=$1
+  local nRotate=$2
   # Setup log file: if TRIS_LOGFILE is not empty, then write logs
-  if [[ -d "$fname" ]]; then
+  if [[ -d $fname ]]; then
     err "Cannot log to $fname, it is a directory!" 2
   fi
-  if [[ "$fname" == */* ]]; then
+  if [[ $fname == */* ]]; then
     mkdir -pv "${fname%/*}"
   fi
-  if [[ "$nRotate" -gt 0 ]]; then # Do log rotation first if needed
+  if [[ $nRotate -gt 0 ]]; then # Do log rotation first if needed
     rotateLog "$fname" "$nRotate"
   fi
   exec 6>"$fname"
@@ -36,16 +36,19 @@ setupLog() {
 }
 
 rotateLog() {
-  local fname="$1"
-  local nRotate="$2"
-  if [[ ! -f "$fname" && ! -h "$fname" ]]; then # No need to rotate if no log at all
+  local fname=$1
+  local nRotate=$2
+  if [[ ! -f $fname && ! -h $fname ]]; then # No need to rotate if no log at all
+    return
+  fi
+  if [[ $nRotate -le 0 ]]; then # No need to rotate if not keeping old logs at all
     return
   fi
   local i
   for (( i=$[nRotate-1]; i>0; i-- )); do
-    if [[ -f "$fname.$i.zst" ]]; then
-      mv -f "$fname.$i.zst" "$fname.$[i+1].zst"
+    if [[ -f $fname.$i ]]; then
+      mv -f "$fname.$i" "$fname.$[i+1]"
     fi
   done
-  zstd -17 -f -o "$fname.1.zst" --rm "$fname" 2>/dev/null
+  mv -v "$fname" "$fname.1"
 }

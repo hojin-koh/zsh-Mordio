@@ -17,22 +17,23 @@
 # The utility to hook a function
 # Usage: addHook <hook-name> <function-name> [begin]
 addHook() {
-  local nameHook="$1"
-  local nameArray="SKRITT_HOOK_$nameHook"
-  local nameFunc="$2"
+  local nameHook=$1
+  local nameArray=SKRITT_HOOK_$nameHook
+  local nameFunc=$2
   shift; shift
-  if [[ -z "${1-}" ]]; then # Default behavior: append at the end
+  if [[ -z ${1-} ]]; then # Default behavior: append at the end
     eval "$nameArray+=( '$nameFunc' )"
-  elif [[ "${1-}" == "begin" ]]; then
+  elif [[ ${1-} == begin ]]; then
     eval "$nameArray=( '$nameFunc' \"\${(@)$nameArray}\" )"
   fi
 }
 
 invokeHook() {
-  local nameHook="$1"
+  local nameHook=$1
   shift
-  local nameArray="SKRITT_HOOK_$nameHook"
-  if [[ "${(P@)#nameArray}" == 0 ]]; then
+  local nameArray=SKRITT_HOOK_$nameHook
+  # P@: indirect + all elements, #: number of elements
+  if [[ ${(P@)#nameArray} == 0 ]]; then
     debug "Empty Hook: $nameHook"
     return
   fi
@@ -40,7 +41,7 @@ invokeHook() {
   local func
   for func in "${(P@)nameArray}"; do
     debug "Start hook function $func"
-    "$func" "$@"
+    $func "$@"
   done
   debug "End Hook: $nameHook"
 }
@@ -58,11 +59,11 @@ SKRITT::FLOW::postparse() {
 declare -g SKRITT_BEGIN_DATE="$(date +'%Y%m%d-%H%M%S')"
 declare -ga SKRITT_HOOK_prerun
 SKRITT::FLOW::prerun() {
-  if [[ -n "${logfile-}" ]]; then
+  if [[ -n ${logfile-} ]]; then
     setupLog "$logfile" "$logrotate"
   fi
 
-  if [[ -n "${skrittCommandLineOriginal-}" ]]; then
+  if [[ -n ${skrittCommandLineOriginal-} ]]; then
     titleinfoBegin "($SKRITT_BEGIN_DATE) Begin $$ $skrittCommandLineOriginal"
   else
     titleinfoBegin "($SKRITT_BEGIN_DATE) Begin $$ $ZSH_ARGZERO $@"

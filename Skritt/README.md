@@ -5,10 +5,13 @@ A heavily-opinionated and colorful zsh scripting framework. This library is gear
 ## Dependencies
 
 - zsh: obviously.
-- GNU coreutils
-- zstd: for compression of log files. (I did mention this is heavily-opinionated, right?)
-- util-linux(optional): for printing help message with `column`
-- pv(optional): only if you need the progess-bar functionality
+- Some sort of coreutils, GNU, busybox, or BSD should be fine. We need `date`, `mktemp`, `cp`, `cat`, and `tee`.
+- A terminal environment that can handle ANSI color codes.
+
+### Optional Dependencies
+
+- column: for printing help messages, can be from util-linux or from the BSD version.
+- pv: only if you need the progess-bar functionality.
 
 ## Installation
 
@@ -23,6 +26,8 @@ Or you can also use submodule:
 ```zsh
 git submodule add https://github.com/hojin-koh/zsh-Skritt deps/zsh-Skritt
 ```
+
+Or just put a copy of this whole project somewhere if you don't want to use git.
 
 ## Usage
 
@@ -156,4 +161,4 @@ If the optional third parameter is "begin", the function will be inserted at the
 
 If built-in option `--logfile` was specified, log text will be written into this file, with automatic log-rotate mechanisms. Note that logging is set up inside the "prerun" phase, so the only proper way to modify this value would be from inside the "postparse" phase.
 
-By default, 3 old log files will be kept, which are named `logfile.1.zst`, `logfile.2.zst`, and `logfile.3.zst`. This value can be changed with `--logrotate` option.
+By default, 3 old log files will be kept, which are named `logfile.1`, `logfile.2`, and `logfile.3`. This value can be changed with `--logrotate` option.

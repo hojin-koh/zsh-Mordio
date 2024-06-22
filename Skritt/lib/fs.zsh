@@ -18,8 +18,8 @@ declare -ga skrittTempDirs
 
 # Add temp dir
 putTemp() {
-  local __var="$1"
-  if [[ -n "${TMPDIR-}" && ! -d "$TMPDIR" ]]; then
+  local __var=$1
+  if [[ -n ${TMPDIR-} && ! -d $TMPDIR ]]; then
     mkdir -pv "$TMPDIR"
   fi
   typeset -g "$__var=$(mktemp -d)"
@@ -30,7 +30,7 @@ putTemp() {
 SKRITT::HOOK::cleanUpTemp() {
   local pathTmp
   for pathTmp in "${(@)skrittTempDirs}"; do
-    if [[ "$pathTmp" != ${TMPDIR}* ]]; then
+    if [[ $pathTmp != ${TMPDIR}* ]]; then
       continue
     fi
     rm -rf "$pathTmp"

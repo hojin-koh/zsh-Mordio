@@ -22,7 +22,7 @@ set -o pipefail
 # Setup our own SHLVL
 export SKRITT_SHLVL=$[${SKRITT_SHLVL-0}+1]
 
-if [[ "${SKRITT_CONFIG_IGNORE_DOTENV-}" != "true" ]]; then
+if [[ ${SKRITT_CONFIG_IGNORE_DOTENV-} != true ]]; then
   if [[ -r .env ]]; then
     source .env
   fi
@@ -40,15 +40,15 @@ if [[ ! -e /dev/fd/6 ]]; then
 fi
 
 # Setup path for our executables
-if [[ -z "${SKRITT_ROOT_DIR-}" ]]; then
-  export SKRITT_ROOT_DIR="${0:a:h}"
+if [[ -z ${SKRITT_ROOT_DIR-} ]]; then
+  export SKRITT_ROOT_DIR=${0:a:h}
 fi
 
-source "$SKRITT_ROOT_DIR/lib/flow.zsh"
-source "$SKRITT_ROOT_DIR/lib/opts.zsh"
-source "$SKRITT_ROOT_DIR/lib/msg.zsh"
-source "$SKRITT_ROOT_DIR/lib/logging.zsh"
-source "$SKRITT_ROOT_DIR/lib/fs.zsh"
+source $SKRITT_ROOT_DIR/lib/flow.zsh
+source $SKRITT_ROOT_DIR/lib/opts.zsh
+source $SKRITT_ROOT_DIR/lib/msg.zsh
+source $SKRITT_ROOT_DIR/lib/logging.zsh
+source $SKRITT_ROOT_DIR/lib/fs.zsh
 
 if declare -f skrittLibraryInit >/dev/null; then
   skrittLibraryInit
@@ -61,7 +61,7 @@ if declare -f setupArgs >/dev/null; then
   setupArgs
 fi
 SKRITT::FLOW::preparse "$@"
-source "$SKRITT_ROOT_DIR/bin/parseopts"
+source $SKRITT_ROOT_DIR/bin/parseopts
 SKRITT::FLOW::postparse "$@"
 
 skrittNeedToRun=true
@@ -69,14 +69,14 @@ if declare -f check >/dev/null; then
   check && skrittNeedToRun=false || skrittNeedToRun=true
 fi
 
-if [[ "$check" == "true" ]]; then
+if [[ $check == true ]]; then
   unset -f TRAPEXIT
-  if [[ "$skrittNeedToRun" == "true" ]]; then
+  if [[ $skrittNeedToRun == true ]]; then
     exit 1
   fi
   exit 0
 else
-  if [[ "$skrittNeedToRun" == "true" || "$force" == "true" ]]; then
+  if [[ $skrittNeedToRun == true || $force == true ]]; then
     SKRITT::FLOW::prerun "$@"
     main "$@"
     SKRITT::FLOW::postrun "$@"

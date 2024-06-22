@@ -17,11 +17,11 @@ typeset -F SECONDS
 opt -Skritt debug false "Whether to show debug messages on screen"
 
 SKRITT::INTERNAL::outputMessage() {
-  local typeMsg="$1"
-  local codeColor="$2"
-  local msg="$3"
-  local charEnd="${4-\n}"
-  local elapsed="$SECONDS"
+  local typeMsg=$1
+  local codeColor=$2
+  local msg=$3
+  local charEnd=${4-\\n}
+  local elapsed=$SECONDS
   printf "\033[%sm[%08.1f] " "$codeColor" "$elapsed" >&5
   printf "[%08.1f] " "$elapsed" >&6
 
@@ -32,7 +32,7 @@ SKRITT::INTERNAL::outputMessage() {
 }
 
 debug() {
-  if [[ "${debug-}" == true ]]; then
+  if [[ ${debug-} == true ]]; then
     printf "\033[0;34m[D-%06.1f] %s\033[m\033[K\n" "$SECONDS" "$1" >&5
   fi
   printf "[D-%06.1f] %s\n" "$SECONDS" "$1" >&6
@@ -55,7 +55,7 @@ warn() {
 
 err() {
   SKRITT::INTERNAL::outputMessage E '1;31' "$1"
-  if [[ "${2-}" -gt 0 ]]; then
+  if [[ ${2-} -gt 0 ]]; then
     exit $2
   fi
 }
@@ -74,7 +74,7 @@ promptyn() {
 }
 
 showReadableTime() {
-  local secTotal="$1"
+  local secTotal=$1
   local hours=$[secTotal/3600]
   local minutes=$[(secTotal%3600)/60]
   local seconds=$[secTotal%60]
@@ -86,6 +86,10 @@ showReadableTime() {
 }
 
 lineProgressBar() {
-  local nLineTotal="$1"
-  pv -l -F "%t %b/$nLineTotal %p %e" -i 2 -s $nLineTotal -S
+  local nLineTotal=$1
+  if command -v pv >/dev/null; then
+    pv -l -F "%t %b/$nLineTotal %p %e" -i 2 -s $nLineTotal -S
+  else
+    cat
+  fi
 }

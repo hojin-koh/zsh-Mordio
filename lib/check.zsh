@@ -19,20 +19,20 @@ getScriptSum() {
 }
 
 isAllOlder() {
-  local var1="$1"
-  local var2="$2"
+  local var1=$1
+  local var2=$2
 
   local filelist1="$(${var1}::ALL::getMainFile)"
   local filelist2="$(${var2}::ALL::getMainFile)"
 
-  local aFile1=( "${(f)filelist1}" )
-  local aFile2=( "${(f)filelist2}" )
+  local aFile1=( ${(f)filelist1} )
+  local aFile2=( ${(f)filelist2} )
 
   local f1
   local f2
   for f1 in "${aFile1[@]}"; do
     for f2 in "${aFile2[@]}"; do
-      if [[ ! "$f1" -ot "$f2" ]]; then
+      if [[ ! $f1 -ot $f2 ]]; then
         return 1
       fi
     done
@@ -48,15 +48,15 @@ MORDIO::FLOW::check() {
   local aVarIn=()
   local aVarOut=()
   for arg in "${(k)mordioMapOptType[@]}"; do
-    if [[ "${mordioMapOptDirection[$arg]}" == "input" ]]; then
-      aVarIn+=( "$arg" )
+    if [[ ${mordioMapOptDirection[$arg]} == input ]]; then
+      aVarIn+=( $arg )
     else
-      aVarOut+=( "$arg" )
+      aVarOut+=( $arg )
     fi
   done
 
   # No output, don't do check here, always run
-  if [[ "${#aVarOut[@]}" == 0 ]]; then
+  if [[ ${#aVarOut[@]} == 0 ]]; then
     return 1
   fi
 

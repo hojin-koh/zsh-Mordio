@@ -19,67 +19,70 @@ declare -gA mordioMapOptDirection
 declare -gA mordioMapOptType
 
 # Register all types
-for f in "$MORDIO_ROOT_DIR/types"/*.zsh; do
-  source "$f"
+for f in $MORDIO_ROOT_DIR/types/*.zsh; do
+  source $f
 done
 
 optType() {
-  local __nameVar="$1"
-  local __inout="$2"
-  local __type="$3"
+  local __nameVar=$1
+  local __inout=$2
+  local __type=$3
 
-  if [[ "$__inout" != "input" && "$__inout" != "output" ]]; then
+  if [[ $__inout != input && $__inout != output ]]; then
     err "Invalid in/out for option $__nameVar: $__type" 35
   fi
-  if [[ -z "${mordioTypeInit[$__type]-}" ]]; then
+  if [[ -z ${mordioTypeInit[$__type]-} ]]; then
     err "Type $__type for option $__nameVar doesn't exist" 35
   fi
-  mordioMapOptDirection[$__nameVar]="$__inout"
-  mordioMapOptType[$__nameVar]="$__type"
+  mordioMapOptDirection[$__nameVar]=$__inout
+  mordioMapOptType[$__nameVar]=$__type
 
   "${mordioTypeInit[$__type]}" "$__nameVar" "$__inout"
 }
 
 populateType() {
-  local __nameVar="$1"
-  local __namespace="$2"
+  local __nameVar=$1
+  local __namespace=$2
 
   local __func
-  for __func in ${(ok)functions[(I)${__namespace}::*]}; do
-    local __stem="${__func##*::}"
-    if [[ "$__stem" == INIT ]]; then continue; fi
-    if [[ "${(Pt)__nameVar}" == "array" ]]; then
+  # [(I)...] all functions matching the pattern. As per zsh doc: "all possible matching keys in an associative array"
+  # k: Return keys instead of values in the associative array subscription (the key here is name of functions)
+  for __func in ${(k)functions[(I)${__namespace}::*]}; do
+    local __stem=${__func##*::}
+    if [[ $__stem == INIT ]]; then continue; fi
+    # t: print out the type name of the variable
+    if [[ ${(Pt)__nameVar} == array ]]; then
       eval "${__nameVar}::${__stem}() { local __i=\"\$1\"; shift; ${__namespace}::${__stem} \"\${${__nameVar}[\$__i]}\" \"\$@\" }"
       eval "${__nameVar}::ALL::${__stem}() { local __i; for (( __i=1; __i<=\${#${__nameVar}[@]}; __i++ )); do ${__nameVar}::${__stem} \"\$__i\" \"\$@\"; done }"
-    elif [[ "${(Pt)__nameVar}" == "scalar" ]]; then 
+    elif [[ ${(Pt)__nameVar} == scalar ]]; then 
       eval "${__nameVar}::${__stem}() { ${__namespace}::${__stem} \"\$$__nameVar\" \"\$@\" }"
       eval "${__nameVar}::ALL::${__stem}() { ${__namespace}::${__stem} \"\$$__nameVar\" \"\$@\" }"
     fi
   done
 
-  if [[ "${mordioMapOptDirection[$__nameVar]}" == "output" ]]; then
-    if declare -f "${__nameVar}::cleanup" >/dev/null; then
-      addHook exit "${__nameVar}::ALL::cleanup"
+  if [[ ${mordioMapOptDirection[$__nameVar]} == output ]]; then
+    if declare -f ${__nameVar}::cleanup >/dev/null; then
+      addHook exit ${__nameVar}::ALL::cleanup
     fi
   fi
 }
 
 MORDIO::FLOW::checkArgNames() {
-  local arg
-  for arg in "${(k)mordioMapOptType[@]}"; do
-    if [[ -n ${(P)arg} ]]; then
-      ${arg}::ALL::checkName
+  local __arg
+  for __arg in "${(k)mordioMapOptType[@]}"; do
+    if [[ -n ${(P)__arg} ]]; then
+      ${__arg}::ALL::checkName
     fi
   done
 }
 addHook postparse MORDIO::FLOW::checkArgNames
 
 MORDIO::FLOW::checkInputArgs() {
-  local arg
-  for arg in "${(k)mordioMapOptType[@]}"; do
-    if [[ "${mordioMapOptDirection[$arg]}" == "input" ]]; then
-      if [[ -n ${(P)arg} ]]; then
-        ${arg}::ALL::checkValid err
+  local __arg
+  for __arg in "${(k)mordioMapOptType[@]}"; do
+    if [[ ${mordioMapOptDirection[$__arg]} == input ]]; then
+      if [[ -n ${(P)__arg} ]]; then
+        ${__arg}::ALL::checkValid err
       fi
     fi
   done
@@ -90,7 +93,8 @@ MORDIO::FLOW::finalizeOutput() {
   local __arg
   local __i
   for __arg in "${(k)mordioMapOptType[@]}"; do
-    if [[ "${mordioMapOptDirection[$__arg]}" == "input" ]]; then continue; fi
+    if [[ ${mordioMapOptDirection[$__arg]} == input ]]; then continue; fi
+    if [[ -z ${(P)__arg} ]]; then continue; fi
     ${__arg}::ALL::finalize $__i
   done
 }
@@ -100,7 +104,8 @@ MORDIO::FLOW::writeMeta() {
   local __arg
   local __i
   for __arg in "${(k)mordioMapOptType[@]}"; do
-    if [[ "${mordioMapOptDirection[$__arg]}" == "input" ]]; then continue; fi
+    if [[ ${mordioMapOptDirection[$__arg]} == input ]]; then continue; fi
+    if [[ -z ${(P)__arg} ]]; then continue; fi
 
     for (( __i=1; __i<=${#${(A)${(P)__arg}}[@]}; __i++ )); do
       (
@@ -111,15 +116,15 @@ MORDIO::FLOW::writeMeta() {
         printf '\n---\n\n'
         date +'%Y-%m-%d %H:%M:%S'
         printf '%s @ %s\n\n' "${ZSH_ARGZERO:t}" "${HOST-${HOSTNAME-}}"
-        local grp
-        local var
-        for grp in "" "${skrittOptGroups[@]}" "Skritt"; do
-          if [[ -n "$grp" ]]; then printf "\n# %s Options:\n" "$grp"; fi
-          for var in ${(k)skrittMapOptGroup[(R)$grp]}; do
-            if [[ "${(Pt)var}" == "array" ]]; then
-              printf "%s=(%s)\n" "$var" "${(P*)var-}"
+        local __grp
+        local __var
+        for __grp in "" "${skrittOptGroups[@]}" "Skritt"; do
+          if [[ -n $__grp ]]; then printf "\n# %s Options:\n" "$__grp"; fi
+          for __var in "${(k)skrittMapOptGroup[(R)$__grp]}"; do
+            if [[ ${(Pt)__var} == array ]]; then
+              printf "%s=(%s)\n" "$__var" "${(P*)__var-}"
             else
-              printf "%s=%s\n" "$var" "${(P)var-}"
+              printf "%s=%s\n" "$__var" "${(P)__var-}"
             fi
           done
         done

@@ -15,10 +15,10 @@
 opt -Mordio auto-logdir "${MORDIO_LOGDIR-}" "Directory to keep logs if logfile is not set"
 
 MORDIO::FLOW::setupLogging() {
-  if [[ -z "$logfile" ]]; then # If the Skritt version is not set
-    if [[ -n "$auto_logdir" ]]; then # If the Mordio version is set
-      local nameScript="${ZSH_ARGZERO##*/}"
-      nameScript="${nameScript%%.zsh}"
+  if [[ -z $logfile ]]; then # If the Skritt version is not set
+    if [[ -n $auto_logdir ]]; then # If the Mordio version is set
+      local nameScript=${ZSH_ARGZERO##*/}
+      nameScript=${nameScript%%.zsh}
       logfile="$auto_logdir/$(date +'%Y%m%d-%H%M%S')-$nameScript.log"
     fi
   fi

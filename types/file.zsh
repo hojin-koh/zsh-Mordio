@@ -18,8 +18,8 @@
 mordioTypeInit[file]=MORDIO::TYPE::file::INIT
 
 MORDIO::TYPE::file::INIT() {
-  local nameVar="$1"
-  local inout="$2"
+  local nameVar=$1
+  local inout=$2
 
   populateType "$nameVar" MORDIO::TYPE::file
 }
@@ -27,8 +27,8 @@ MORDIO::TYPE::file::INIT() {
 # === Mordio Things ===
 
 MORDIO::TYPE::file::checkName() {
-  local fname="$1"
-  if [[ "$fname" == *.zsh ]]; then
+  local fname=$1
+  if [[ $fname == *.zsh ]]; then
     return 0
   else
     return 36
@@ -36,17 +36,17 @@ MORDIO::TYPE::file::checkName() {
 }
 
 MORDIO::TYPE::file::checkValid() {
-  local fname="$1"
-  local typeMsg="$2"
-  if [[ ! -r "$fname" ]]; then
+  local fname=$1
+  local typeMsg=$2
+  if [[ ! -r $fname ]]; then
     "$typeMsg" "Argument $fname does not exist"
     return 36
   fi
-  if [[ "$fname" == *.zsh && ! -x "$fname" ]]; then
+  if [[ $fname == *.zsh && ! -x $fname ]]; then
     "$typeMsg" "Argument $fname is a script but not executable"
     return 36
   fi
-  if [[ ! -r "$fname.meta" ]]; then
+  if [[ ! -r $fname.meta ]]; then
     "$typeMsg" "Argument $fname has no metadata"
     return 36
   fi
@@ -54,49 +54,42 @@ MORDIO::TYPE::file::checkValid() {
 }
 
 MORDIO::TYPE::file::finalize() {
-  local fname="$1"
-  mv -vf "$fname.tmp" "$fname"
+  local fname=$1
+  mv -vf $fname.tmp "$fname"
 }
 
 MORDIO::TYPE::file::cleanup() {
-  local fname="$1"
-  rm -vf "$fname.tmp"
+  local fname=$1
+  rm -vf $fname.tmp
 }
 
 MORDIO::TYPE::file::computeMeta() {
-  local fname="$1"
+  cat >/dev/null
 }
 
 MORDIO::TYPE::file::saveMeta() {
-  local fname="$1"
-  if [[ "$fname" == */* ]]; then
+  local fname=$1
+  if [[ $fname == */* ]]; then
     mkdir -pv "${fname%/*}"
   fi
-  cat > "$fname.meta"
+  cat > $fname.meta
 }
 
-MORDIO::TYPE::file::dumpMeta() {
-  local fname="$1"
-  gawk -F= '/^---$/ {exit 0} 1' "$fname.meta"
-}
-
-MORDIO::TYPE::file::checkScriptSum() {
-  local fname="$1"
-  MORDIO::TYPE::file::dumpMeta "$1" \
-  | gawk -vss="$(getScriptSum || true)" -F= \
-    'BEGIN {rtn=1} /^_scriptsum=/ {if ($2 == ss) rtn=0;} END {exit rtn}'
-}
-
-MORDIO::TYPE::file::getMainFile() {
-  local fname="$1"
-  echo "$fname"
+MORDIO::TYPE::file::putMeta() {
+  local fname=$1
+  local target=$2
+  mordioMeta=()
+  source $fname.meta
+  declare -gA $target
+  # This is basically associative array copy
+  set -A $target "${(kv@)mordioMeta}"
 }
 
 # === Save/Load ===
 
 MORDIO::TYPE::file::isReal() {
-  local fname="$1"
-  if [[ "$fname" == *.zsh ]]; then
+  local fname=$1
+  if [[ $fname == *.zsh ]]; then
     false
   else
     true
@@ -104,8 +97,8 @@ MORDIO::TYPE::file::isReal() {
 }
 
 MORDIO::TYPE::file::getLoader() {
-  local fname="$1"
-  if [[ "$fname" == *.zsh ]]; then
+  local fname=$1
+  if [[ $fname == *.zsh ]]; then
     printf '"./%s"' "$fname"
     return 0
   else
@@ -114,9 +107,9 @@ MORDIO::TYPE::file::getLoader() {
 }
 
 MORDIO::TYPE::file::load() {
-  local fname="$1"
-  if [[ "$fname" == *.zsh ]]; then
-    "./$fname"
+  local fname=$1
+  if [[ $fname == *.zsh ]]; then
+    ./$fname
     return 0
   else
     return 1
@@ -124,14 +117,14 @@ MORDIO::TYPE::file::load() {
 }
 
 MORDIO::TYPE::file::save() {
-  local fname="$1"
-  if [[ "$fname" == */* ]]; then
+  local fname=$1
+  if [[ $fname == */* ]]; then
     mkdir -pv "${fname%/*}"
   fi
-  if [[ "$fname" == *.zsh ]]; then
-    echo "#!/usr/bin/env zsh" > "$fname.tmp"
-    cat >> "$fname.tmp"
-    chmod 755 "$fname.tmp"
+  if [[ $fname == *.zsh ]]; then
+    echo "#!/usr/bin/env zsh" > $fname.tmp
+    cat >> $fname.tmp
+    chmod 755 $fname.tmp
     return 0
   else
     return 1
@@ -139,9 +132,9 @@ MORDIO::TYPE::file::save() {
 }
 
 MORDIO::TYPE::file::saveCopy() {
-  local fname="$1"
-  local fnameSource="$2"
-  if [[ "$fname" == */* ]]; then
+  local fname=$1
+  local fnameSource=$2
+  if [[ $fname == */* ]]; then
     mkdir -pv "${fname%/*}"
   fi
   install -v "$fnameSource" $fname.tmp

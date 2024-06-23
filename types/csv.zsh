@@ -18,17 +18,18 @@
 mordioTypeInit[csv]=MORDIO::TYPE::csv::INIT
 
 MORDIO::TYPE::csv::INIT() {
-  local nameVar="$1"
-  local inout="$2"
+  local nameVar=$1
+  local inout=$2
 
+  populateType "$nameVar" MORDIO::TYPE::file
   populateType "$nameVar" MORDIO::TYPE::csv
 }
 
 MORDIO::TYPE::csv::checkName() {
-  local fname="$1"
-  if [[ "$fname" == *.csv ]]; then
+  local fname=$1
+  if [[ $fname == *.csv ]]; then
     true
-  elif [[ "$fname" == *.csv.zst ]]; then
+  elif [[ $fname == *.csv.zst ]]; then
     true
   else
     err "Input argument $fname has invalid extension" 36
@@ -36,20 +37,20 @@ MORDIO::TYPE::csv::checkName() {
 }
 
 MORDIO::TYPE::csv::checkValid() {
-  local fname="$1"
-  if [[ ! -r "$fname" ]]; then
+  local fname=$1
+  if [[ ! -r $fname ]]; then
     err "Input argument $fname does not exist" 36
   fi
-  if [[ ! -r "$fname.meta" ]]; then
+  if [[ ! -r $fname.meta ]]; then
     err "Input argument $fname has no metadata" 36
   fi
 }
 
 MORDIO::TYPE::csv::load() {
-  local fname="$1"
-  if [[ "$fname" == *.csv.zst ]]; then
+  local fname=$1
+  if [[ $fname == *.csv.zst ]]; then
     zstd -dc "$fname"
-  elif [[ "$fname" == *.csv ]]; then
+  elif [[ $fname == *.csv ]]; then
     cat "$fname"
   fi
 }

@@ -14,6 +14,8 @@
 
 # Type-related functions
 
+declare -ga mordioInputArgs
+declare -ga mordioOutputArgs
 declare -gA mordioTypeInit
 declare -gA mordioMapOptDirection
 declare -gA mordioMapOptType
@@ -36,6 +38,12 @@ optType() {
   fi
   mordioMapOptDirection[$__nameVar]=$__inout
   mordioMapOptType[$__nameVar]=$__type
+
+  if [[ $__inout == input ]]; then
+    mordioInputArgs+=($__nameVar)
+  elif [[ $__inout == output ]]; then
+    mordioOutputArgs+=($__nameVar)
+  fi
 
   "${mordioTypeInit[$__type]}" "$__nameVar" "$__inout"
 }
@@ -69,22 +77,18 @@ populateType() {
 
 MORDIO::FLOW::checkArgNames() {
   local __arg
-  for __arg in "${(k)mordioMapOptType[@]}"; do
-    if [[ -n ${(P)__arg} ]]; then
-      ${__arg}::ALL::checkName
-    fi
+  for __arg in "${mordioInputArgs[@]}" "${mordioOutputArgs[@]}"; do
+    if [[ -z ${(P)__arg} ]]; then continue; fi
+    ${__arg}::ALL::checkName
   done
 }
 addHook postparse MORDIO::FLOW::checkArgNames
 
 MORDIO::FLOW::checkInputArgs() {
   local __arg
-  for __arg in "${(k)mordioMapOptType[@]}"; do
-    if [[ ${mordioMapOptDirection[$__arg]} == input ]]; then
-      if [[ -n ${(P)__arg} ]]; then
-        ${__arg}::ALL::checkValid err
-      fi
-    fi
+  for __arg in "${mordioInputArgs[@]}"; do
+    if [[ -z ${(P)__arg} ]]; then continue; fi
+    ${__arg}::ALL::checkValid err
   done
 }
 addHook prerun MORDIO::FLOW::checkInputArgs
@@ -92,8 +96,7 @@ addHook prerun MORDIO::FLOW::checkInputArgs
 MORDIO::FLOW::finalizeOutput() {
   local __arg
   local __i
-  for __arg in "${(k)mordioMapOptType[@]}"; do
-    if [[ ${mordioMapOptDirection[$__arg]} == input ]]; then continue; fi
+  for __arg in "${mordioOutputArgs[@]}"; do
     if [[ -z ${(P)__arg} ]]; then continue; fi
     ${__arg}::ALL::finalize $__i
   done
@@ -103,8 +106,7 @@ addHook postrun MORDIO::FLOW::finalizeOutput
 MORDIO::FLOW::writeMeta() {
   local __arg
   local __i
-  for __arg in "${(k)mordioMapOptType[@]}"; do
-    if [[ ${mordioMapOptDirection[$__arg]} == input ]]; then continue; fi
+  for __arg in "${mordioOutputArgs[@]}"; do
     if [[ -z ${(P)__arg} ]]; then continue; fi
 
     for (( __i=1; __i<=${#${(A)${(P)__arg}}[@]}; __i++ )); do

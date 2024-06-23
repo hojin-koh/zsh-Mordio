@@ -15,7 +15,7 @@
 # Check whether the script need to run
 
 getScriptSum() {
-  cat "$ZSH_ARGZERO" "${dependencies[@]-/dev/null}" | md5sum | cut -d' ' -f1
+  cat "$ZSH_ARGZERO" "${dependencies[@]-/dev/null}" | b3sum --no-names
 }
 
 isAllOlder() {

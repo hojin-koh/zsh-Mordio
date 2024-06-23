@@ -1,4 +1,3 @@
-#!/usr/bin/env zsh
 # Copyright 2020-2024, Hojin Koh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,22 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The central runner of Mordio
+# Mordio-specific options
+opt -Mordio nj ${OMP_NUM_THREADS-3} "Number of parallel processes on this machine"
 
-if [[ -z ${MORDIO_ROOT_DIR-} ]]; then
-  export MORDIO_ROOT_DIR=${0:a:h}
-fi
-
-skrittLibraryInit() {
-  source $MORDIO_ROOT_DIR/lib/opts.zsh
-  source $MORDIO_ROOT_DIR/lib/logging.zsh
-  source $MORDIO_ROOT_DIR/lib/type.zsh
-  source $MORDIO_ROOT_DIR/lib/check.zsh
-  source $MORDIO_ROOT_DIR/lib/parallel.zsh
-
-  if declare -f mordioLibraryInit >/dev/null; then
-    mordioLibraryInit
-  fi
+MORDIO::FLOW::exportParallel() {
+  if [[ -z $nj ]]; then return; fi
+  export OMP_THREAD_LIMIT=$nj
+  export OMP_NUM_THREADS=$nj
+  export NUMEXPR_NUM_THREADS=$nj
+  export OPENBLAS_NUM_THREADS=$nj
+  export MKL_NUM_THREADS=$nj
+  export JULIA_NUM_THREADS=$nj
 }
-
-source ${0:a:h}/Skritt/skritt
+addHook prerun MORDIO::FLOW::exportParallel

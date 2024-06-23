@@ -23,6 +23,7 @@ skrittLibraryInit() {
   source $MORDIO_ROOT_DIR/lib/opts.zsh
   source $MORDIO_ROOT_DIR/lib/logging.zsh
   source $MORDIO_ROOT_DIR/lib/type.zsh
+  source $MORDIO_ROOT_DIR/lib/meta.zsh
   source $MORDIO_ROOT_DIR/lib/check.zsh
   source $MORDIO_ROOT_DIR/lib/parallel.zsh
 

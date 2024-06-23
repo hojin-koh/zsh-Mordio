@@ -19,7 +19,7 @@ MORDIO::FLOW::setupLogging() {
     if [[ -n $auto_logdir ]]; then # If the Mordio version is set
       local nameScript=${ZSH_ARGZERO##*/}
       nameScript=${nameScript%%.zsh}
-      logfile="$auto_logdir/$(date +'%Y%m%d-%H%M%S')-$nameScript.log"
+      logfile="$auto_logdir/$SKRITT_BEGIN_DATE-$nameScript.log"
     fi
   fi
 }

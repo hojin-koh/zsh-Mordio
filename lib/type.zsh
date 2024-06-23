@@ -95,44 +95,9 @@ addHook prerun MORDIO::FLOW::checkInputArgs
 
 MORDIO::FLOW::finalizeOutput() {
   local __arg
-  local __i
   for __arg in "${mordioOutputArgs[@]}"; do
     if [[ -z ${(P)__arg} ]]; then continue; fi
-    ${__arg}::ALL::finalize $__i
+    ${__arg}::ALL::finalize
   done
 }
 addHook postrun MORDIO::FLOW::finalizeOutput
-
-MORDIO::FLOW::writeMeta() {
-  local __arg
-  local __i
-  for __arg in "${mordioOutputArgs[@]}"; do
-    if [[ -z ${(P)__arg} ]]; then continue; fi
-
-    for (( __i=1; __i<=${#${(A)${(P)__arg}}[@]}; __i++ )); do
-      (
-        ${__arg}::computeMeta $__i
-        printf '_scriptsum='
-        getScriptSum || true
-
-        printf '\n---\n\n'
-        date +'%Y-%m-%d %H:%M:%S'
-        printf '%s @ %s\n\n' "${ZSH_ARGZERO:t}" "${HOST-${HOSTNAME-}}"
-        local __grp
-        local __var
-        for __grp in "" "${skrittOptGroups[@]}" "Skritt"; do
-          if [[ -n $__grp ]]; then printf "\n# %s Options:\n" "$__grp"; fi
-          for __var in "${(k)skrittMapOptGroup[(R)$__grp]}"; do
-            if [[ ${(Pt)__var} == array ]]; then
-              printf "%s=(%s)\n" "$__var" "${(P*)__var-}"
-            else
-              printf "%s=%s\n" "$__var" "${(P)__var-}"
-            fi
-          done
-        done
-      ) | ${__arg}::saveMeta $__i
-    done
-
-  done
-}
-addHook postrun MORDIO::FLOW::writeMeta

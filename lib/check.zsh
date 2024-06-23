@@ -14,84 +14,62 @@
 
 # Check whether the script need to run
 
-getScriptSum() {
-  cat "$ZSH_ARGZERO" "${dependencies[@]-/dev/null}" | b3sum --no-names
-}
+opt -Mordio bump '' "Bump the metadata of output files without actually re-run the script"
 
-isAllOlder() {
-  local var1=$1
-  local var2=$2
+# Check if any output data is outdated in regards to inputs, scripts, and config
+# If no need to run, return 0, else return 1
+MORDIO::FLOW::check() {
+  # No output, don't do check here, always run
+  if [[ ${#mordioOutputArgs[@]} == 0 ]]; then
+    return 1
+  fi
 
-  local filelist1="$(${var1}::ALL::getMainFile)"
-  local filelist2="$(${var2}::ALL::getMainFile)"
+  local __arg
+  # If any of the output isn't valid, then no need for further check, just run
+  for __arg in "${mordioOutputArgs[@]}"; do
+    if [[ -z ${(P)__arg} ]]; then continue; fi
+    ${__arg}::ALL::checkValid debug
+  done
 
-  local aFile1=( ${(f)filelist1} )
-  local aFile2=( ${(f)filelist2} )
+  # Now that all output exists, just bump the meta file
+  # So that we don't need to re-run
+  if [[ $bump == true ]]; then
+    MORDIO::FLOW::writeALLMeta # Pretending we DID generated these output
+    return 0
+  fi
 
-  local f1
-  local f2
-  for f1 in "${aFile1[@]}"; do
-    for f2 in "${aFile2[@]}"; do
-      if [[ ! $f1 -ot $f2 ]]; then
+  # If any of the output is from outdated script or mismatched config, run
+  makeScriptConfig
+  makeScriptSum
+  local __i
+  local __cached
+  for __arg in "${mordioOutputArgs[@]}"; do
+    # P has low priority, so it need to be wrapped in the inner subsitution
+    # A: treat the output as an array, whether it's a scalar or array
+    for (( __i=1; __i<=${#${(A)${(P)__arg}[@]}}; __i++ )); do
+      getMeta $__arg $__i "_config" __cached
+      if [[ $__cached != $mordioCachedConfig ]]; then
+        warn "\$$__arg was from outdated config, will rerun"
+        return 1
+      fi
+      getMeta $__arg $__i "_scriptsum" __cached
+      if [[ $__cached != $mordioCachedScriptSum ]]; then
+        warn "\$$__arg was from outdated script, will rerun"
         return 1
       fi
     done
   done
-  return 0
-}
 
-opt -Mordio bump '' "Bump the metadata of output files without actually re-run the script"
-
-# Check if all input data is older than all output data, and the script checksum didn't change
-# If no need to run, return 0, else return 1
-MORDIO::FLOW::check() {
-  local aVarIn=()
-  local aVarOut=()
-  for arg in "${(k)mordioMapOptType[@]}"; do
-    if [[ ${mordioMapOptDirection[$arg]} == input ]]; then
-      aVarIn+=( $arg )
-    else
-      aVarOut+=( $arg )
-    fi
-  done
-
-  # No output, don't do check here, always run
-  if [[ ${#aVarOut[@]} == 0 ]]; then
-    return 1
-  fi
-
-  local arg1
-  local arg2
-  for arg2 in "${aVarOut[@]}"; do
-    if [[ -n ${(P)arg2} ]]; then
-      ${arg2}::ALL::checkValid debug
-    fi
-  done
-
-  # Now that all output exists, just bump the meta file and update the timestamp
-  # So that we don't need to re-run
-  if [[ $bump == true ]]; then
-    MORDIO::FLOW::writeMeta # Pretending we DID generated these output
-    for arg2 in "${aVarOut[@]}"; do
-      info "Bumping metadata for $arg2=${(P)arg2[*]}"
-      touch ${(z)$(${arg2}::ALL::getMainFile)} /dev/null # /dev/null ensure we always has at least 1 argument to touch
-    done
-    return 0
-  fi
-
-  for arg2 in "${aVarOut[@]}"; do
-    for arg1 in "${aVarIn[@]}"; do
-      if [[ -n ${(P)arg1} && -n ${(P)arg2} ]]; then
-        if ! isAllOlder "$arg1" "$arg2"; then
-          warn "$arg1 not older than $arg2, will rerun"
-          return 1
-        fi
+  # If any of the output is from outdated input, rerun
+  makeScriptInputSum
+  for __arg in "${mordioOutputArgs[@]}"; do
+    for (( __i=1; __i<=${#${(A)${(P)__arg}[@]}}; __i++ )); do
+      getMeta $__arg $__i "_insum" __cached
+      if [[ $__cached != $mordioCachedInputSum ]]; then
+        warn "\$$__arg was from outdated input, will rerun"
+        return 1
       fi
     done
-    if ! ${arg2}::ALL::checkScriptSum; then
-      warn "Script changed for $arg2, will rerun"
-      return 1
-    fi
   done
 
   return 0

@@ -49,10 +49,6 @@ MORDIO::TYPE::model::checkName() {
 
 # === Save/Load ===
 
-MORDIO::TYPE::model::isReal() {
-  MORDIO::TYPE::file::isReal "$@"
-}
-
 MORDIO::TYPE::model::getLoader() {
   local fname=$1
   if ! MORDIO::TYPE::file::getLoader "$@"; then
@@ -114,8 +110,4 @@ MORDIO::TYPE::model::save() {
       return 1
     fi
   fi
-}
-
-MORDIO::TYPE::model::saveCopy() {
-  MORDIO::TYPE::file::saveCopy "$@"
 }

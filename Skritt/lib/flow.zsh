@@ -63,11 +63,9 @@ SKRITT::FLOW::prerun() {
     setupLog "$logfile" "$logrotate"
   fi
 
-  if [[ -n ${skrittCommandLineOriginal-} ]]; then
-    titleinfoBegin "($SKRITT_BEGIN_DATE) Begin $$ $skrittCommandLineOriginal"
-  else
-    titleinfoBegin "($SKRITT_BEGIN_DATE) Begin $$ $ZSH_ARGZERO $@"
-  fi
+  local cmdlineTitle=${skrittCommandLineOriginal-$ZSH_ARGZERO $*}
+  if [[ $#cmdlineTitle -gt 200 ]]; then cmdlineTitle=${cmdlineTitle:0:200}...; fi
+  titleinfoBegin "($SKRITT_BEGIN_DATE) Begin $$ $cmdlineTitle"
   debug "@ ${HOST-${HOSTNAME-}}"
   invokeHook prerun "$@"
 }

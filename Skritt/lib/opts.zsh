@@ -19,6 +19,7 @@ declare -ga skrittOptGroups
 declare -ga skrittRequiredArgs
 declare -gA skrittMapOptGroup
 declare -gA skrittMapOptDesc
+declare -gA skrittMapOptDefault
 
 # The utility to declare an option
 # Usage: opt [-r] [-<Group Name>] <opt-name> <default-value> <description>
@@ -59,9 +60,9 @@ opt() {
   fi
 
   # Make the variable and assign it the default value
+  skrittMapOptDefault[$__nameVar]=$__valueDefault
   if [[ $__valueDefault == \(* ]]; then
     declare -ga $__nameVar
-    eval "$__nameVar=$__valueDefault"
   else
     declare -g $__nameVar
     eval "$__nameVar='$__valueDefault'"
@@ -85,6 +86,16 @@ printHelpMessage() {
     done
   ) >&2
 }
+
+fillDefaultArrayArgs() {
+  local __var
+  for __var in "${(@)skrittOpts}"; do
+    if [[ ${(Pt)__var-} == array && ${(P)#__var} -eq 0 ]]; then
+      eval "$__var=${skrittMapOptDefault[$__var]}"
+    fi
+  done
+}
+addHook postparse fillDefaultArrayArgs
 
 checkRequiredArgs() {
   local __var

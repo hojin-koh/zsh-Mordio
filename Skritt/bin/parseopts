@@ -38,7 +38,7 @@ __::parse_one_option() {
 
   if [[ "${(Pt)__key-}" == "array" ]]; then
     if [[ -z "$__value" ]]; then
-      eval "$__key=()"
+      eval "$__key+=( '' )"
     else
       eval "$__key+=( '$__value' )"
     fi

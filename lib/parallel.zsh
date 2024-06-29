@@ -63,3 +63,43 @@ doParallelPipeText() {
     wait $pid
   done
 }
+
+computeMIMOStride() {
+  local __argMain=$1
+  shift
+  local __argRest=( "$@" )
+
+  # Initialize
+  for __arg in "${__argRest[@]}"; do
+    declare -g "STRIDE_$__arg=${(P)#__argMain}"
+  done
+
+  # If output count is 1, then everything below isn't necessary
+  if [[ ${(P)#__argMain} -le 1 ]]; then return; fi
+
+  for __arg in "${__argRest[@]}"; do
+    # If there is only one, then the default stride is fine
+    if [[ ${(P)#__arg} -le 1 ]]; then continue; fi
+    if [[ $[${(P)#__argMain}%${(P)#__arg}] -ne 0 ]]; then
+      err "\$$__argMain should have the same or integer multiple length with \$$__arg" 15
+    fi
+    eval "STRIDE_$__arg=$[${(P)#__argMain}/${(P)#__arg}]"
+  done
+}
+
+computeMIMOIndex() {
+  local __idx=$1
+  shift
+  local __argMain=$1
+  shift
+  local __argRest=( "$@" )
+
+  local __infoSet
+  for __arg in "${__argRest[@]}"; do
+    local __varStride=STRIDE_$__arg
+    local __varIndex=INDEX_$__arg
+    declare -g "$__varIndex=$[(i-1)/${(P)__varStride}+1]"
+    __infoSet+="${__arg}[${(P)__varIndex}] "
+  done
+  info "Processing set $__idx/${(P)#__argMain}: $__infoSet${${(P)__argMain}[$i]}"
+}

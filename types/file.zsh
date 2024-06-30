@@ -55,7 +55,7 @@ MORDIO::TYPE::file::checkValid() {
 
 MORDIO::TYPE::file::finalize() {
   local fname=$1
-  mv -vf $fname.tmp "$fname"
+  mv -f $fname.tmp "$fname"
 }
 
 MORDIO::TYPE::file::cleanup() {

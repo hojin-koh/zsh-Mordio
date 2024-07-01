@@ -34,7 +34,7 @@ MORDIO::FLOW::check() {
   # Now that all output exists, just bump the meta file
   # So that we don't need to re-run
   if [[ $bump == true ]]; then
-    MORDIO::FLOW::writeALLMeta # Pretending we DID generated these output
+    MORDIO::FLOW::writeAllMeta # Pretending we DID generated these output
     return 0
   fi
 

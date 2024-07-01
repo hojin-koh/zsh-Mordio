@@ -25,7 +25,8 @@ SKRITT::INTERNAL::outputMessage() {
   printf "\033[%sm[%08.1f] " "$codeColor" "$elapsed" >&5
   printf "[%08.1f] " "$elapsed" >&6
 
-  printf "$typeMsg%.0s" {1..$SKRITT_SHLVL} >&2
+  printf "$typeMsg%.0s" {1..$SKRITT_SHLVL} >&5
+  printf "$typeMsg%.0s" {1..$SKRITT_SHLVL} >&6
 
   printf " %s\033[m\033[K$charEnd" "$msg" >&5
   printf " %s$charEnd" "$msg" >&6

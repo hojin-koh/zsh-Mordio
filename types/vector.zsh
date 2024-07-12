@@ -14,7 +14,8 @@
 
 # Type definition: vector
 # vector is a series of id/vector pair, separated by a tab (vec.zst)
-# or is in tar file + npy format (npy.tar.zst)
+# Dimensions of vectors are separated by tabs
+# Dimensions are supposed to be the same across all rows
 
 mordioTypeInit[vector]=MORDIO::TYPE::vector::INIT
 
@@ -44,10 +45,7 @@ MORDIO::TYPE::vector::checkName() {
 
 MORDIO::TYPE::vector::computeMeta() {
   local fname=$1
-  printf "[nRecord]="
-  wc -l
-  # TODO: ndim
-  MORDIO::TYPE::table::computeMeta "$@"
+  perl -CSAD -lane 'END {my $NF = $#F+1; print "[nRecord]=$.\n[nDim]=$NF"}'
 }
 
 # === Save/Load ===

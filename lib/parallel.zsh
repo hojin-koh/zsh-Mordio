@@ -78,12 +78,15 @@ computeMIMOStride() {
   if [[ ${(P)#__argMain} -le 1 ]]; then return; fi
 
   for __arg in "${__argRest[@]}"; do
+    local __varStride=STRIDE_$__arg
     # If there is only one, then the default stride is fine
-    if [[ ${(P)#__arg} -le 1 ]]; then continue; fi
-    if [[ $[${(P)#__argMain}%${(P)#__arg}] -ne 0 ]]; then
-      err "\$$__argMain should have the same or integer multiple length with \$$__arg" 15
+    if [[ ${(P)#__arg} -gt 1 ]]; then
+      if [[ $[${(P)#__argMain}%${(P)#__arg}] -ne 0 ]]; then
+        err "\$$__argMain should have the same or integer multiple length with \$$__arg" 15
+      fi
+      eval "$__varStride=$[${(P)#__argMain}/${(P)#__arg}]"
     fi
-    eval "STRIDE_$__arg=$[${(P)#__argMain}/${(P)#__arg}]"
+    debug "$__varStride=${(P)__varStride}"
   done
 }
 
@@ -100,6 +103,7 @@ computeMIMOIndex() {
     local __varIndex=INDEX_$__arg
     declare -g "$__varIndex=$[(i-1)/${(P)__varStride}+1]"
     __infoSet+="${__arg}[${(P)__varIndex}] "
+    debug "MIMO $__idx/${(P)#__argMain}: $__arg=${${(P)__arg}[${(P)__varIndex}]-}"
   done
-  info "Processing set $__idx/${(P)#__argMain}: $__infoSet${${(P)__argMain}[$i]}"
+  info "Processing set $__idx/${(P)#__argMain}: $__infoSet${${(P)__argMain}[$__idx]}"
 }

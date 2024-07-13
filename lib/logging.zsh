@@ -13,13 +13,20 @@
 # limitations under the License.
 
 opt -Mordio auto-logdir "${MORDIO_LOGDIR-}" "Directory to keep logs if logfile is not set"
+export MORDIO_LOGFILE
 
 MORDIO::FLOW::setupLogging() {
-  if [[ -z $logfile ]]; then # If the Skritt version is not set
-    if [[ -n $auto_logdir ]]; then # If the Mordio version is set
-      local nameScript=${ZSH_ARGZERO##*/}
-      nameScript=${nameScript%%.zsh}
-      logfile="$auto_logdir/$SKRITT_BEGIN_DATE-$nameScript.log"
+  if [[ -z $logfile ]]; then # If the Skritt version was not set manually
+    if [[ -z $MORDIO_LOGFILE ]]; then # If the default from upper levels is not set
+      if [[ -n $auto_logdir ]]; then # If the Mordio version is set
+        local nameScript=${ZSH_ARGZERO##*/}
+        nameScript=${nameScript%%.zsh}
+        logfile=$auto_logdir/$SKRITT_BEGIN_DATE-$nameScript.log
+        logrotate=0
+        export MORDIO_LOGFILE=$logfile
+      fi
+    else # Upper levels have set the logfile to use
+      logfile=$MORDIO_LOGFILE
     fi
   fi
 }

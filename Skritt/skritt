@@ -57,6 +57,7 @@ fi
 opt -Skritt check false "Check whether this script need to run (return false=need)"
 opt -Skritt force false "Always run the script even if there's no need"
 
+debug "Begin script: $ZSH_ARGZERO $*"
 if declare -f setupArgs >/dev/null; then
   setupArgs
 fi

@@ -30,8 +30,10 @@ setupLog() {
   fi
   if [[ $nRotate -gt 0 ]]; then # Do log rotation first if needed
     rotateLog "$fname" "$nRotate"
+    exec 6>"$fname"
+  else # No rotate, then just append
+    exec 6>>"$fname"
   fi
-  exec 6>"$fname"
   exec 2> >(tee -a /dev/fd/6 >&2)
 }
 

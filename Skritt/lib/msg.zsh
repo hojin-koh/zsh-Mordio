@@ -34,9 +34,13 @@ SKRITT::INTERNAL::outputMessage() {
 
 debug() {
   if [[ ${debug-} == true ]]; then
-    printf "\033[0;34m[D-%06.1f] %s\033[m\033[K\n" "$SECONDS" "$1" >&5
+    printf "\033[0;34m[%08.1f] " "$SECONDS" >&5
+    printf "D%.0s" {1..$SKRITT_SHLVL} >&5
+    printf " %s\033[m\033[K\n" "$1" >&5
   fi
-  printf "[D-%06.1f] %s\n" "$SECONDS" "$1" >&6
+  printf "[%08.1f] " "$SECONDS" >&6
+  printf "D%.0s" {1..$SKRITT_SHLVL} >&6
+  printf " %s\n" "$1" >&6
 }
 
 titleinfoBegin() {

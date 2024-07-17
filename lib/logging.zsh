@@ -27,6 +27,7 @@ MORDIO::FLOW::setupLogging() {
       fi
     else # Upper levels have set the logfile to use
       logfile=$MORDIO_LOGFILE
+      logrotate=0
     fi
   fi
 }

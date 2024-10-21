@@ -38,6 +38,12 @@ MORDIO::FLOW::check() {
     return 0
   fi
 
+  # If the script is very expensive, and at this point output exists
+  # Don't run
+  if [[ ${veryexpensive-} == true ]]; then
+    return 0
+  fi
+
   # If any of the output is from outdated script or mismatched config, run
   makeScriptConfig
   makeScriptSum

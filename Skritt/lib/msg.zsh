@@ -93,7 +93,7 @@ showReadableTime() {
 lineProgressBar() {
   local nLineTotal=$1
   if command -v pv >/dev/null; then
-    pv -l -F "%t %b/$nLineTotal %p %e" -i 2 -s $nLineTotal -S
+    pv -l -F "%t %b/$nLineTotal %p %e" -i 2 -s $nLineTotal -S 2>&5
   else
     cat
   fi

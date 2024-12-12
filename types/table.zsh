@@ -13,8 +13,11 @@
 # limitations under the License.
 
 # Type definition: table
-# Table is a series of id/contents rows, separated by tabs
-# ids are supposed to be unique
+# Table is a csv with headers, and the first column is always an id
+# Differences from standard csvs:
+# - ids are supposed to be unique
+# - ids should not contain any comma for easier processing with command-line tools
+# - newlines are escaped as \n to make sure every record fits in one line
 
 mordioTypeInit[table]=MORDIO::TYPE::table::INIT
 
@@ -31,7 +34,7 @@ MORDIO::TYPE::table::INIT() {
 MORDIO::TYPE::table::checkName() {
   local fname=$1
   if ! MORDIO::TYPE::file::checkName "$@"; then
-    if [[ $fname == *.zst ]]; then
+    if [[ $fname == *.csv.zst ]]; then
       return 0
     else
       err "Input argument $fname has invalid extension"
@@ -43,8 +46,7 @@ MORDIO::TYPE::table::checkName() {
 
 MORDIO::TYPE::table::computeMeta() {
   local fname=$1
-  printf "[nRecord]="
-  wc -l
+  printf "[nRecord]=%d\n" "$[$(wc -l)-1]"
 }
 
 # === Save/Load ===
@@ -52,7 +54,7 @@ MORDIO::TYPE::table::computeMeta() {
 MORDIO::TYPE::table::getLoader() {
   local fname=$1
   if ! MORDIO::TYPE::file::getLoader "$@"; then
-    if [[ $fname == *.zst ]]; then
+    if [[ $fname == *.csv.zst ]]; then
       printf 'zstd -dc "%s"' "$fname"
       return 0
     else
@@ -64,7 +66,7 @@ MORDIO::TYPE::table::getLoader() {
 MORDIO::TYPE::table::load() {
   local fname=$1
   if ! MORDIO::TYPE::file::load "$@"; then
-    if [[ $fname == *.zst ]]; then
+    if [[ $fname == *.csv.zst ]]; then
       zstd -dc "$fname"
       return 0
     else
@@ -75,28 +77,28 @@ MORDIO::TYPE::table::load() {
 
 MORDIO::TYPE::table::getLoaderKey() {
   MORDIO::TYPE::table::getLoader "$@"
-  printf ' | %s' "cut -d\$'\\t' -f1"
+  printf ' | %s' "cut -d, -f1"
 }
 
 MORDIO::TYPE::table::loadKey() {
   MORDIO::TYPE::table::load "$@" \
-  | cut -d$'\t' -f1
+  | cut -d, -f1
 }
 
 MORDIO::TYPE::table::getLoaderValue() {
   MORDIO::TYPE::table::getLoader "$@"
-  printf ' | %s' "cut -d\$'\\t' -f2-"
+  printf ' | %s' "cut -d, -f2-"
 }
 
 MORDIO::TYPE::table::loadValue() {
   MORDIO::TYPE::table::load "$@" \
-  | cut -d$'\t' -f2-
+  | cut -d, -f2-
 }
 
 MORDIO::TYPE::table::save() {
   local fname=$1
   if ! MORDIO::TYPE::file::save "$@"; then
-    if [[ $fname == *.zst ]]; then
+    if [[ $fname == *.csv.zst ]]; then
       zstd --rsyncable -13 -T$nj > $fname.tmp
       return 0
     else

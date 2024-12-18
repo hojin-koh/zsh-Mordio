@@ -94,7 +94,7 @@ lineProgressBar() {
   local nLineTotal=$1
   shift
   if command -v pv >/dev/null; then
-    pv -l -YK -W --average-rate-window 3600 -F "%t %b/$nLineTotal %p %e" -i 2 -s $nLineTotal "$@" 2>&5
+    pv -l -W --average-rate-window 3600 -F "%t %b/$nLineTotal %p %e" -i 2 -s $nLineTotal "$@" 2>&5
   else
     cat
   fi

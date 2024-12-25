@@ -1,3 +1,4 @@
 *
 !.gitignore
-!mergeParallelText.py
+!mergeParallelCsv.py
+!splitCsv.py

@@ -37,8 +37,7 @@ MORDIO::TYPE::table::checkName() {
     if [[ $fname == *.csv.zst ]]; then
       return 0
     else
-      err "Input argument $fname has invalid extension"
-      return 36
+      err "Input argument $fname has invalid extension" 36
     fi
   fi
   return 0
@@ -46,7 +45,11 @@ MORDIO::TYPE::table::checkName() {
 
 MORDIO::TYPE::table::computeMeta() {
   local fname=$1
-  printf "[nRecord]=%d\n" "$[$(wc -l)-1]"
+  local nFields=$[$(wc -l)-1]
+  if [[ $nFields < 0 ]]; then
+    err "Output table $fname have no headers and contents" 33
+  fi
+  printf "[nRecord]=%d\n" "$nFields"
 }
 
 # === Save/Load ===

@@ -15,6 +15,7 @@
 # Message-related functions
 typeset -F SECONDS
 opt -Skritt debug false "Whether to show debug messages on screen"
+opt -Skritt notitle false "Whether to disable showing start/end messages"
 
 SKRITT::INTERNAL::outputMessage() {
   local typeMsg=$1
@@ -44,10 +45,14 @@ debug() {
 }
 
 titleinfoBegin() {
-  SKRITT::INTERNAL::outputMessage '>' '1;35' "$1"
+  if [[ ${notitle-} != true ]]; then
+    SKRITT::INTERNAL::outputMessage '>' '1;35' "$1"
+  fi
 }
 titleinfoEnd() {
-  SKRITT::INTERNAL::outputMessage '<' '1;32' "$1"
+  if [[ ${notitle-} != true ]]; then
+    SKRITT::INTERNAL::outputMessage '<' '1;32' "$1"
+  fi
 }
 
 info() {

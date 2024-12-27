@@ -19,7 +19,7 @@ declare -gA mordioMeta
 makeScriptSum() {
   declare -g mordioCachedScriptSum
   if [[ -z $mordioCachedScriptSum ]]; then
-    mordioCachedScriptSum="$(cat "$ZSH_ARGZERO" "${dependencies[@]-/dev/null}" | b3sum -l 16 --no-names)"
+    mordioCachedScriptSum="$(cat "$ZSH_ARGZERO" "${metaDepScripts[@]-/dev/null}" | b3sum -l 16 --no-names)"
   fi
 }
 
@@ -27,7 +27,7 @@ makeScriptConfig() {
   declare -g mordioCachedConfig
   local __var
   if [[ -z $mordioCachedConfig ]]; then
-    for __var in ${importantconfig[@]-}; do
+    for __var in ${metaDepOpts[@]-}; do
       if [[ ${(Pt)__var} == array ]]; then
         mordioCachedConfig+="$__var=(${(P*)__var-});;"
       else

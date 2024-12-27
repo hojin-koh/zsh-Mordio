@@ -39,8 +39,8 @@ MORDIO::FLOW::check() {
   fi
 
   # If the script is very expensive, and at this point output exists
-  # Don't run
-  if [[ ${veryexpensive-} == true ]]; then
+  # Don't rerun
+  if [[ ${avoidRerun-} == true ]]; then
     return 0
   fi
 

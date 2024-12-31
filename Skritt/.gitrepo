@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/hojin-koh/zsh-Skritt
 	branch = main
-	commit = b549cc0d064823a92feddbb3a7e01060f654eda2
-	parent = c1b4fd217e3b0539db724d29c66b488536078823
+	commit = 295ad9b87055c580fdc9430cc30f1dcb17073b56
+	parent = e68a1b202065786d6a78ec1e1d1a8959a1286623
 	method = merge
 	cmdver = 0.4.9

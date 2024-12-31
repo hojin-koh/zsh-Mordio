@@ -33,8 +33,7 @@ setupLog() {
   else # No rotate, then just append
     exec 6>>"$fname"
   fi
-  exec 2> /dev/null
-  exec 2> >(tee -a /dev/fd/6 >&2)
+  exec 2> >(tee -a /dev/fd/6 >&5)
 }
 
 rotateLog() {

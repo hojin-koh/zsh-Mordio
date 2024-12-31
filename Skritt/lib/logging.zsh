@@ -21,7 +21,6 @@ opt -Skritt logrotate 3 "Number of old log files to keep"
 setupLog() {
   local fname=$1
   local nRotate=$2
-  # Setup log file: if TRIS_LOGFILE is not empty, then write logs
   if [[ -d $fname ]]; then
     err "Cannot log to $fname, it is a directory!" 2
   fi
@@ -34,6 +33,7 @@ setupLog() {
   else # No rotate, then just append
     exec 6>>"$fname"
   fi
+  exec 2> /dev/null
   exec 2> >(tee -a /dev/fd/6 >&2)
 }
 

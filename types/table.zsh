@@ -45,11 +45,11 @@ MORDIO::TYPE::table::checkName() {
 
 MORDIO::TYPE::table::computeMeta() {
   local fname=$1
-  local nFields=$[$(wc -l)-1]
-  if [[ $nFields < 0 ]]; then
+  local nRecord=$[$(wc -l)-1]
+  if [[ $nRecord < 0 ]]; then
     err "Output table $fname have no headers and contents" 33
   fi
-  printf "[nRecord]=%d\n" "$nFields"
+  printf "[nRecord]=%d\n" "$nRecord"
 }
 
 # === Save/Load ===

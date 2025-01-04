@@ -1,4 +1,3 @@
-#!/usr/bin/env zsh
 # Copyright 2020-2024, Hojin Koh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,24 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The central runner of Mordio
-
-if [[ -z ${MORDIO_ROOT_DIR-} ]]; then
-  export MORDIO_ROOT_DIR=${0:a:h}
-fi
-
-skrittLibraryInit() {
-  source $MORDIO_ROOT_DIR/lib/msg.zsh
-  source $MORDIO_ROOT_DIR/lib/opts.zsh
-  source $MORDIO_ROOT_DIR/lib/logging.zsh
-  source $MORDIO_ROOT_DIR/lib/type.zsh
-  source $MORDIO_ROOT_DIR/lib/meta.zsh
-  source $MORDIO_ROOT_DIR/lib/check.zsh
-  source $MORDIO_ROOT_DIR/lib/parallel.zsh
-
-  if declare -f mordioLibraryInit >/dev/null; then
-    mordioLibraryInit
-  fi
+progressBarTar() {
+  $MORDIO_ROOT_DIR/bin/progressTar.py "$1"
 }
-
-source ${0:a:h}/Skritt/skritt

@@ -15,3 +15,7 @@
 progressBarTar() {
   $MORDIO_ROOT_DIR/bin/progressTar.py "$1"
 }
+
+progressBarCsv() {
+  $MORDIO_ROOT_DIR/bin/progressCsv.py "$1"
+}

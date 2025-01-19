@@ -27,22 +27,23 @@ def main():
     try:
         from tqdm import tqdm
         fpShow = open('/dev/fd/5', 'w', encoding='utf-8')
-        pbar = tqdm(total=nFile, file=fpShow, smoothing=0, mininterval=2, dynamic_ncols=True)
     except:
-        pbar = None
-        pass
+        fpShow = sys.stderr
+    pbar = tqdm(total=nRow, file=fpShow, smoothing=0, mininterval=1, dynamic_ncols=True, colour='blue', delay=1)
+    pbar.disable = True
     
     with tarfile.open(fileobj=sys.stdout.buffer, mode='w|') as fpwTar:
         for entry in fpTar:
+            if pbar.disable:
+                pbar.unpause()
+                pbar.disable = False # Start showing on first value
             if entry.isdir():
                 continue
             fpFile = fpTar.extractfile(entry)
             fpwTar.addfile(entry, fileobj=fpFile)
-            if pbar:
-                pbar.update(1)
+            pbar.update(1)
 
-    if pbar:
-        pbar.close()
+    pbar.close()
 
 if __name__ == '__main__':
     main()

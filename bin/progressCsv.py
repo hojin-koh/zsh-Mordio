@@ -25,26 +25,26 @@ def main():
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
 
-    try:
-        from tqdm import tqdm
-        fpShow = open('/dev/fd/5', 'w', encoding='utf-8')
-        pbar = tqdm(total=nRow, file=fpShow, smoothing=0, mininterval=2, dynamic_ncols=True)
-    except:
-        pbar = None
-        pass
-
-
     objReader = csv.DictReader(sys.stdin)
     objWriter = csv.DictWriter(sys.stdout, objReader.fieldnames, lineterminator="\n")
     objWriter.writeheader()
 
-    for row in objReader:
-        objWriter.writerow(row)
-        if pbar:
-            pbar.update(1)
+    try:
+        from tqdm import tqdm
+        fpShow = open('/dev/fd/5', 'w', encoding='utf-8')
+    except:
+        fpShow = sys.stderr
+    pbar = tqdm(total=nRow, file=fpShow, smoothing=0, mininterval=1, dynamic_ncols=True, colour='blue', delay=1)
+    pbar.disable = True
 
-    if pbar:
-        pbar.close()
+    for row in objReader:
+        if pbar.disable:
+            pbar.unpause()
+            pbar.disable = False # Start showing on first value
+        objWriter.writerow(row)
+        pbar.update(1)
+
+    pbar.close()
 
 if __name__ == '__main__':
     main()

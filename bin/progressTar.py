@@ -29,7 +29,7 @@ def main():
         fpShow = open('/dev/fd/5', 'w', encoding='utf-8')
     except:
         fpShow = sys.stderr
-    pbar = tqdm(total=nRow, file=fpShow, smoothing=0, mininterval=1, dynamic_ncols=True, colour='blue', delay=1)
+    pbar = tqdm(total=nFile, file=fpShow, smoothing=0, mininterval=1, dynamic_ncols=True, colour='blue', delay=1)
     pbar.disable = True
     
     with tarfile.open(fileobj=sys.stdout.buffer, mode='w|') as fpwTar:

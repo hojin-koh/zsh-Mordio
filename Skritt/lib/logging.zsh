@@ -1,4 +1,4 @@
-# Copyright 2020-2024, Hojin Koh
+# Copyright 2020-2026, Hojin Koh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 # Logging-related functions
 
 # Default options
-opt -Skritt logfile '' "Log File"
-opt -Skritt logrotate 3 "Number of old log files to keep"
+addOption logfile group=Skritt default= desc="Log File"
+addOption logrotate group=Skritt default=3 desc="Number of old log files to keep"
 
 setupLog() {
   local fname=$1

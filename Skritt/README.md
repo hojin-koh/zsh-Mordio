@@ -57,7 +57,7 @@ The main script goes here
 [I-0000.0] < End ./scriptname.zsh
 ```
 
-The main added functionalities of this library are:
+The main functionalities of this library are:
 - Opinionated colorful messages
 - Command-line parsing
 - Need-to-run check
@@ -81,30 +81,28 @@ The main added functionalities of this library are:
 
 ### Command-line
 
-Typing `./scriptname.zsh --help` will display an auto-generated help message, showing available options. If wrong options are given at the command line, the help message will also be displayed along with the error message.
+Invoking `scriptname.zsh --help` will display an auto-generated help message, showing available options. If wrong options are given at the command line, the help message will also be displayed along with the error message.
 
-`opt` command declares an option, the usage is: `opt [-r] [-<group>] <opt-name> <default-value> <description>`.
-
-`-r` means this option is mandatory, and it will be an error if this value is empty. If a required argument is empty, but some positional arguments are given, these positional arguments will be used to fill in the required arguments in order.
-
-`-<group>` specifies the which group this option belongs to. It is mainly used in help messages to group options for easier reading. If not specified, the option will belong to a group with empty name, and will be listed on the top of the help message. You cannot specify "r" as the group name.
+`addOption` command declares an option, the usage is: `addOption <opt-name> group=<group> default=<default-value> desc=<description>`.
 
 `<opt-name>` is the name of the option. This also decides the corresponding variable name. For example, if the option name is `cm-threshold`, then you can specify `--cm-threshold=0.5` or `cm-threshold=0.5` on the command line, and the value will be stored inside a variable named `cm_threshold`. The option-name to variable conversion is as follows (Yes, there might be conflicts if you use consecutive dashes and dots—don't do that):
   - A single dash is converted to one underscore `_`.
   - A single dot is converted to three understores `___`.
 
-`<default-value>` is the default value.
+`<default-value>` is the default value. If no default value is provided, this option is mandatory, and it will be an error if this value is empty. If a required argument is empty, but some positional arguments are given, these positional arguments will be used to fill in the required arguments in order.
+
+`<group>` specifies the which group this option belongs to. It is mainly used in help messages to group options for easier reading. If not specified, the option will belong to a group with empty name, and will be listed on the top of the help message.
 
 `<description>` is the help string regarding this option. It will be automatically added to the help message.
 
-`opt` commands must be used inside a function named `setupArgs()`, which should be defined in the script. An example:
+`addOption` commands should be used inside a function named `setupArgs()`, which should be defined in the script. An example:
 
 ```zsh
 #!/usr/bin/env zsh
 description="Example of argument parsing"
 
 setupArgs() {
-  opt -r opt-1 '' "First Option"
+  addOption opt-1 desc="First Option"
 }
 
 main() {

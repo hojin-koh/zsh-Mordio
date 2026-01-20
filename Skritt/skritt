@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-# Copyright 2020-2024, Hojin Koh
+# Copyright 2020-2026, Hojin Koh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ if [[ -z ${SKRITT_ROOT_DIR-} ]]; then
   export SKRITT_ROOT_DIR=${0:a:h}
 fi
 
+# Load library functions
 source $SKRITT_ROOT_DIR/lib/flow.zsh
 source $SKRITT_ROOT_DIR/lib/opts.zsh
 source $SKRITT_ROOT_DIR/lib/msg.zsh
@@ -54,8 +55,8 @@ if declare -f skrittLibraryInit >/dev/null; then
   skrittLibraryInit
 fi
 
-opt -Skritt check false "Check whether this script need to run (return false=need)"
-opt -Skritt force false "Always run the script even if there's no need"
+addOption check group=Skritt default=false desc="Check whether this script need to run (return false=need)"
+addOption force group=Skritt default=false desc="Always run the script even if not necessary"
 
 debug "Begin script: $ZSH_ARGZERO $*"
 if declare -f setupArgs >/dev/null; then
@@ -71,7 +72,7 @@ if declare -f check >/dev/null; then
 fi
 
 if [[ $check == true ]]; then
-  unset -f TRAPEXIT
+  unset -f TRAPEXIT # Unregister the "exit" lifecycle since we're not going to run anything now
   if [[ $skrittNeedToRun == true ]]; then
     exit 1
   fi
@@ -82,7 +83,7 @@ else
     main "$@"
     SKRITT::FLOW::postrun "$@"
   else
-    unset -f TRAPEXIT
+    unset -f TRAPEXIT # Unregister the "exit" lifecycle since we're not going to run anything now
     debug "Check passed, no need to run $skrittCommandLineOriginal"
   fi
 fi

@@ -1,4 +1,4 @@
-# Copyright 2020-2024, Hojin Koh
+# Copyright 2020-2026, Hojin Koh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 
 # Message-related functions
 typeset -F SECONDS
-opt -Skritt debug false "Whether to show debug messages on screen"
-opt -Skritt notitle false "Whether to disable showing start/end messages"
+addOption debug group=Skritt default=false desc="Whether to show debug messages on screen"
+addOption notitle group=Skritt default=false desc="Whether to disable showing start/end messages"
 
 SKRITT::INTERNAL::outputMessage() {
   local typeMsg=$1

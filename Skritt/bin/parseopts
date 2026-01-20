@@ -60,8 +60,7 @@ while true; do
   fi
 
   case "$1" in
-  # If the enclosing script is called with --help option, print the help
-  # message and exit.  Scripts should put help messages in $tris_help_message
+  # If the enclosing script is called with --help option, print the help message and exit.
   --help|-h)
     printHelpMessage
     unset -f TRAPEXIT

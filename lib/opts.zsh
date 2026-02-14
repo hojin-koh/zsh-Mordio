@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Mordio-specific options
-opt -Mordio nj ${OMP_NUM_THREADS-3} "Number of parallel processes on this machine"
+addOption nj group=Mordio default=${OMP_NUM_THREADS-3} desc="Number of parallel processes on this machine"
 
 MORDIO::FLOW::exportParallel() {
   if [[ -z $nj ]]; then return; fi

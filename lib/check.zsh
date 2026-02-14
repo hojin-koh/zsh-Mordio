@@ -14,7 +14,7 @@
 
 # Check whether the script need to run
 
-opt -Mordio bump '' "Bump the metadata of output files without actually re-run the script"
+addOption bump group=Mordio default= desc="Bump the metadata of output files without actually re-run the script"
 
 # Check if any output data is outdated in regards to inputs, scripts, and config
 # If no need to run, return 0, else return 1
